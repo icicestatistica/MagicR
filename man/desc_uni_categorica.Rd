@@ -46,25 +46,20 @@ desc_uni_categorica(
 }
 \value{
 Um objeto `list` contendo os seguintes elementos:
-
-- **testes**: Data frame com informações sobre o teste realizado.
-- **result**: Data frame com as seguintes colunas (dependendo dos parâmetros):
-  - `Característica`: Os níveis da variável categórica.
-  - `Frequência`: Contagem absoluta de cada nível.
-  - `Freq. Relativa`: Porcentagem relativa de cada nível.
-  - `Freq.`: Combinação de frequência absoluta e relativa (se `label = TRUE`).
-  - `Freq. Acumulada`: Frequência acumulada em valores absolutos e relativos (se `acumula = TRUE`).
-- **texto**: Texto interpretativo sobre os grupos da variável categórica.
-- **interp**: Interpretação textual mais detalhada sobre a variável.
-- **tabela**: Resultado do teste qui-quadrado, se aplicável.
-- **grafico**: Objeto gráfico (ggplot2) com o gráfico de barras.
+\item{testes}{Data frame com informações sobre o teste realizado.}
+\item{result}{Data frame com as frequências absolutas, relativas e acumuladas.}
+\item{texto}{Texto interpretativo sobre os grupos da variável categórica.}
+\item{interp}{Interpretação textual resumida sobre a variável}
+\item{tabela}{Resultado do teste qui-quadrado, se aplicável.}
+\item{grafico}{Objeto gráfico (ggplot2) com o gráfico de barras.}
 }
 \description{
-Esta função realiza uma análise descritiva univariada para variáveis categóricas, incluindo tabelas de frequência, 
+Esta função realiza uma análise descritiva univariada para variáveis categóricas, incluindo tabelas de frequência,
 interpretação textual e gráficos.
 }
 \details{
 A função produz:
+
 - Uma tabela com frequência absoluta, relativa e opcionalmente acumulada.
 - Um texto descritivo interpretativo da variável categórica.
 - Opcionalmente, um gráfico de barras para visualização.
