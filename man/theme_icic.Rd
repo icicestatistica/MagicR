@@ -46,6 +46,5 @@ p <- ggplot(NULL, aes(x=dados)) +
    
 p2 = p + theme_icic(sentido = "y")
 print(p2)
-
 }
 \keyword{internal}

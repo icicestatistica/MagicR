@@ -32,12 +32,9 @@
 #' variavel = factor(c("Masculino", "Feminino", "Masculino"))
 #' grafico_categorica(var = variavel, nome = "Gênero")
 #'
-#' @import ggthemes
+#' @import ggthemes forcats
 #' @export
 grafico_categorica <- function(var,nome, niveis='auto', cor='cyan4', ordenar=T,virgula=F){
-  require(dplyr)
-  require(forcats)
-  require(ggplot2)
   var = unlist(var)
   if (niveis[1]=='auto') niveis = names(table(var))
   var = factor(var, levels=niveis)

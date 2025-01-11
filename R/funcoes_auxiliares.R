@@ -26,9 +26,9 @@ pvalor = function (p) {
 #' @param corteinicial Valor numérico indicando a posição inicial para o corte do texto.
 #'
 #' @return Retorna um vetor de strings com as partes separadas por cortes. Caso o texto não possa ser dividido, retorna `NA`.
+#' @import stringr
 #' @keywords internal
 vetor_comsep_c <- function(vec,corteinicial){
-    require(stringr)
     res = c()
     for (vetor in vec) {
       a = T
@@ -63,9 +63,10 @@ return(res)}
 #' @param vetor Um vetor de strings onde os pontos serão substituídos por vírgulas, caso o parâmetro `virgula` seja `TRUE`.
 #' @param virgula Um valor lógico que determina se a substituição de ponto por vírgula deve ocorrer. O valor padrão é `FALSE` (não substitui).
 #' @return O vetor original com os pontos substituídos por vírgulas (se `virgula` for `TRUE`).
+#' @import stringr
 #' @keywords internal
 ponto_para_virgula = function (vetor, virgula = F) {
-  if(virgula==T) res = str_replace_all(vetor, "\\.", "\\,") else res=vetor
+  if(virgula==T) res = stringr::str_replace_all(vetor, "\\.", "\\,") else res=vetor
   return(res)
 }
 
@@ -90,11 +91,10 @@ ponto_para_virgula = function (vetor, virgula = F) {
 #'
 #' @import knitr
 relatorio <- function(a, pularprimeiro = TRUE, dig = 2) {
-  require(knitr)
   if (pularprimeiro == TRUE) comeco = 2 else comeco = 1
   for (i in comeco:length(a)) {
     if (is.null(a[[i]]) == TRUE) tantofaz = 0 else {
-      if (class(a[[i]])[1] == "data.frame") print(kable(a[[i]], row.names = FALSE, digits = dig)) else
+      if (class(a[[i]])[1] == "data.frame") print(knitr::kable(a[[i]], row.names = FALSE, digits = dig)) else
         if (class(a[[i]])[1] == "list") relatorio(a[[i]], FALSE) else
           if (class(a[[i]])[1] == "character") cat(a[[i]], sep = "\n") else
             print(a[[i]])
@@ -143,7 +143,7 @@ relatorio <- function(a, pularprimeiro = TRUE, dig = 2) {
 #'    
 #' p2 = p + theme_icic(sentido = "y")
 #' print(p2)
-#' 
+#' @import ggthemes
 #' @keywords internal
 theme_icic <- function(sentido = "v") {
   if (sentido == "h") {
