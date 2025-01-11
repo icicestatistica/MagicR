@@ -47,7 +47,7 @@ grafico_categorica <- function(var,nome, niveis='auto', cor='cyan4', ordenar=T,v
     if(length(niveis) > 2) {
       result <- na.omit(tab) %>% mutate(var=fct_reorder(var, desc(Freq))) %>%
         ggplot() + geom_bar(aes(x=var,y=Freq),fill=cor,stat="identity")  +
-        ylim(0,max(table(var))*1.1)+theme_clean()  + ylab("") + xlab("") + ggtitle(paste0(vetor_comsep_c(nome,50)," (n=",length(na.omit(var)),")",collapse=""))+            geom_text(aes(x=var,y=Freq),label=ponto_para_virgula(tab$perc,virgula),vjust=-0.5) +
+        ylim(0,max(table(var))*1.1)+ggthemes::theme_clean()  + ylab("") + xlab("") + ggtitle(paste0(vetor_comsep_c(nome,50)," (n=",length(na.omit(var)),")",collapse=""))+            geom_text(aes(x=var,y=Freq),label=ponto_para_virgula(tab$perc,virgula),vjust=-0.5) +
         theme(
           plot.background = element_rect(colour="white"),
           axis.text.x=element_text(size=12),
