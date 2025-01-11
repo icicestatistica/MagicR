@@ -68,3 +68,39 @@ ponto_para_virgula = function (vetor, virgula = F) {
   if(virgula==T) res = str_replace_all(vetor, "\\.", "\\,") else res=vetor
   return(res)
 }
+
+#' Gera um relatório formatado a partir de uma lista.
+#'
+#' Esta função percorre uma lista de objetos e gera um relatório de acordo com o tipo de cada item. Para data.frames, a função imprime uma tabela formatada (com kable). Para listas, chama a própria função recursivamente. Para vetores de caracteres, imprime os itens no formato de texto (com cat), e para outros objetos, apenas imprime o valor.
+#'
+#' @param a Um vetor ou lista contendo os objetos a serem relatados. Pode incluir data.frames, listas, vetores de caracteres ou outros tipos de objetos.
+#' @param pularprimeiro Um valor lógico (default = TRUE). Se TRUE, o primeiro elemento da lista/vetor é ignorado.
+#' @param dig Um número inteiro (default = 2). Define o número de casas decimais a serem exibidas nas tabelas de data.frames.
+#'
+#' @details A função utiliza o pacote `knitr` para formatar as tabelas quando encontra objetos do tipo `data.frame`. Quando encontra listas, a função é chamada recursivamente para gerar um relatório para cada item. Para objetos do tipo `character`, os valores são impressos em formato de texto.
+#'
+#' @examples
+#' # Exemplo de uso:
+#' lista_exemplo <- list("",
+#'   data.frame(A = 1:3, B = c(4.567, 5.678, 6.789)),
+#'   "Texto de exemplo",
+#'   list(data.frame(C = 1:2, D = c(7.890, 8.901)))
+#' )
+#' relatorio(lista_exemplo)
+#'
+#' @import knitr
+relatorio <- function(a, pularprimeiro = TRUE, dig = 2) {
+  require(knitr)
+  if (pularprimeiro == TRUE) comeco = 2 else comeco = 1
+  for (i in comeco:length(a)) {
+    if (is.null(a[[i]]) == TRUE) tantofaz = 0 else {
+      if (class(a[[i]])[1] == "data.frame") print(kable(a[[i]], row.names = FALSE, digits = dig)) else
+        if (class(a[[i]])[1] == "list") relatorio(a[[i]], FALSE) else
+          if (class(a[[i]])[1] == "character") cat(a[[i]], sep = "\n") else
+            print(a[[i]])
+    }
+  }
+}
+
+
+
