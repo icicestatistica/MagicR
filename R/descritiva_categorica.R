@@ -36,6 +36,7 @@
 grafico_categorica <- function(var,nome, niveis='auto', cor='cyan4', ordenar=T,virgula=F){
   require(dplyr)
   require(forcats)
+  require(ggplot2)
   var = unlist(var)
   if (niveis[1]=='auto') niveis = names(table(var))
   var = factor(var, levels=niveis)
@@ -111,6 +112,8 @@ grafico_categorica <- function(var,nome, niveis='auto', cor='cyan4', ordenar=T,v
 grafico_categorica_vert = function (var, nome, niveis = "auto", cor = "cyan4", ordenar = T,
                                     virgula = F)
 {
+  require(ggplot2)
+  require(dplyr)
   var = unlist(var)
   if (niveis[1] == "auto") niveis = names(table(var))
   df = table(var) %>% data.frame()
