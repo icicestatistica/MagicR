@@ -72,12 +72,12 @@ desc_uni_continua <- function(vari,nome,bins=20,texto=T, grafico=T,cor='cyan4',d
     simetria = 5*(dife)/as.numeric(d$Estatística[8])
     if(abs(simetria) > 1) { if(simetria >0) qt = "é significativa, indicando assimetria com concentração à esquerda e cauda à direita." else qt = "é significativa, indicando assimetria com concentração à direita e cauda à esquerda."} else qt = "não é significativa, indicando simetria."
     if(d$Estatística[1]==d$Estatística[3]) {tex <- c("* **",nome,": ** A variável '",nome,"' não teve perda de dados, também chamada de *\"missings\"*, portanto todas as ",d$Estatística[1]," linhas do banco estão preenchidas.")} else
-    {nr=eval(parse(text=stringr::str_sub(str_split(d$Estatística[2]," ")[[1]][2],2,-3)))
+    {nr=eval(parse(text=stringr::str_sub(stringr::str_split(d$Estatística[2]," ")[[1]][2],2,-3)))
     if(nr<=5) miss <- c("Como há menos de 5% de *missings* (",nr,"%), não há motivos para se preocupar com a ausência de dados.") else { if(nr<20) miss <- c("Como as não respostas representam ",nr,"% das linhas, cabe perguntar-se se há algum tipo de viés (algum fator que influenciou essa ausência de forma sistemática).") else miss <- c("Ressaltamos que há uma grande quantidade de não respostas para essa variável (",nr,"%), por isso recomendamos que algum tipo de explicação seja dada pela ausência desses dados.")}
-    tex <- c("* **",nome,": ** Das ",d$Estatística[1]," linhas presentes no banco de dados, houve ",str_split(d$Estatística[2]," ")[[1]][1], " não respostas,  também chamada \"missings\". Assim, totalizamos ",d$Estatística[3]," observações no banco de dados. ", miss," \n")}
+    tex <- c("* **",nome,": ** Das ",d$Estatística[1]," linhas presentes no banco de dados, houve ",stringr::str_split(d$Estatística[2]," ")[[1]][1], " não respostas,  também chamada \"missings\". Assim, totalizamos ",d$Estatística[3]," observações no banco de dados. ", miss," \n")}
     tex <- c(tex, " Passamos a avaliar como os valores estão distribuídos: \n")
     tex <- c(tex, "  + Os dados variaram no intervalo (",d$Estatística[4] ,"), portanto sua amplitude (diferença entre o maior e o menor) foi ",round(-eval(parse(text=d$Estatística[4])),digitos),"; \n",
-             "  + Olhando para os quartis, percebemos que 25% dos valores foram menores que ",str_split(d$Estatística[5],"-")[[1]][1]," e 25% foram maiores que ",str_split(d$Estatística[5],"-")[[1]][2],". Assim, a metade \"central\"  dos dados se distribuiu ao longo de ", -eval(parse(text=d$Estatística[5]))," unidades. Esta quantia também é chamada \"Intervalo Interquartil\"; \n",
+             "  + Olhando para os quartis, percebemos que 25% dos valores foram menores que ",stringr::str_split(d$Estatística[5],"-")[[1]][1]," e 25% foram maiores que ",stringr::str_split(d$Estatística[5],"-")[[1]][2],". Assim, a metade \"central\"  dos dados se distribuiu ao longo de ", -eval(parse(text=d$Estatística[5]))," unidades. Esta quantia também é chamada \"Intervalo Interquartil\"; \n",
              "  + A mediana obtida foi ",d$Estatística[6], ", que indica que 50% dos dados estão abaixo desse valor e 50% estão acima. A diferença entre a média (",d$Estatística[7],") e a mediana (",d$Estatística[6],") ",qt," \n",
              "  + A variabilidade é medida pelo desvio padrão (",d$Estatística[8],"), e indica quanto os dados variam da média obtida. \n",
              "  + O CV - Coeficiente de Variação - (",d$Estatística[9],") compara o desvio padrão com a média. O ideal é que este índice seja o mais baixo possível (idealmente menor que 50%).",cvtexto,
@@ -111,7 +111,7 @@ desc_uni_continua <- function(vari,nome,bins=20,texto=T, grafico=T,cor='cyan4',d
 #' grafico <- graficos_continua(dados, nome = "Variável X")
 #' print(grafico)
 #'
-#' @import ggplot2 colorspace ggthemes patchwork ggrepel
+#' @import ggplot2 colorspace ggthemes patchwork ggrepel stringr
 #' @export
 #'
 

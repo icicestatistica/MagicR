@@ -32,6 +32,7 @@
 #' variavel = factor(c("Masculino", "Feminino", "Masculino"))
 #' grafico_categorica(var = variavel, nome = "Gênero")
 #'
+#' @import ggthemes
 #' @export
 grafico_categorica <- function(var,nome, niveis='auto', cor='cyan4', ordenar=T,virgula=F){
   require(dplyr)
@@ -45,7 +46,7 @@ grafico_categorica <- function(var,nome, niveis='auto', cor='cyan4', ordenar=T,v
   tab <- data.frame(table(var),perc=paste0(table(var),paste0(" (",100*round(prop.table(table(var)),3),"%)")),prop=paste0(table(var),paste0("\n  (",100*round(prop.table(table(var)),3),"%)")))
   if(ordenar==T) {
     if(length(niveis) > 2) {
-      result <- na.omit(tab) %>% mutate(var=fct_reorder(var, desc(Freq))) %>%
+      result <- na.omit(tab) %>% mutate(var=forcats::fct_reorder(var, desc(Freq))) %>%
         ggplot() + geom_bar(aes(x=var,y=Freq),fill=cor,stat="identity")  +
         ylim(0,max(table(var))*1.1)+ ggthemes::theme_clean()  + ylab("") + xlab("") + ggtitle(paste0(vetor_comsep_c(nome,50)," (n=",length(na.omit(var)),")",collapse=""))+            geom_text(aes(x=var,y=Freq),label=ponto_para_virgula(tab$perc,virgula),vjust=-0.5) +
         theme(
