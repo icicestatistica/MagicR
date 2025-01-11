@@ -148,16 +148,8 @@ grafico_categorica_vert = function (var, nome, niveis = "auto", cor = "cyan4", o
 #' @param dig Número de casas decimais para arredondamento. Padrão: `2`.
 #'
 #' @return Um objeto `list` com os seguintes elementos:
-#' \item{texto}{Texto interpretativo do teste qui-quadrado e dos resíduos. Inclui significância, estatística do teste, V de Cramer (cramer_v pacote rstatix) e detalhes dos resíduos significativos.}
-#' \item{tabela}{Data frame contendo:}
-#' \tabular{ll}{
-#'   \strong{Categoria} \tab \strong{Descrição} \cr
-#'   Categoria \tab Os níveis da variável categórica. \cr
-#'   Frequência observada \tab Proporção observada de cada categoria. \cr
-#'   IC 95% \tab Intervalo de confiança da proporção. \cr
-#'   Resíduos padronizados \tab Diferença entre as proporções observadas e esperadas, ajustada. \cr
-#'   p-valor \tab Significância estatística dos resíduos, considerando a correção de Bonferroni. Resíduos significativos têm um `*`. \cr
-#' }
+#' \item{texto}{Texto interpretativo do teste qui-quadrado e dos resíduos.}
+#' \item{tabela}{Dataframe contendo a proporção observada de cada categoria com seu intervalo de confiança, os resíduos padronizados e significância correspondente considerando a correção de bonferroni. Resíduos significativos são assinalados com `*`.}
 #'
 #' @examples
 #' # Dados fictícios
@@ -174,7 +166,6 @@ grafico_categorica_vert = function (var, nome, niveis = "auto", cor = "cyan4", o
 #' \item As interpretações do tamanho do efeito baseiam-se no V de Cramer e variam com o número de graus de liberdade.
 #' \item Caso a variável tenha apenas uma categoria, a função retorna uma mensagem informando a impossibilidade de realizar o teste.
 #' \item As funções `chisq.test` e `prop.test` são usadas para o cálculo do teste qui-quadrado e dos intervalos de confiança, respectivamente.
-#' \item A função `cramer_v` (do pacote `rstatix`) é utilizada para calcular o efeito do teste.
 #'
 #' @import stringr rstatix knitr
 #' @export
