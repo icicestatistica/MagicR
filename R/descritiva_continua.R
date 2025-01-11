@@ -29,11 +29,10 @@
 #' # Visualizando os resultados
 #' resultado$grafico
 #'
-#' @import stringr ggplot2 colorspace ggthemes patchwork ggrepel
+#' @import stringr colorspace ggthemes patchwork ggrepel
 #' @export
 #'
 desc_uni_continua <- function(vari,nome,bins=20,texto=T, grafico=T,cor='cyan4',digitos=2, idioma="PT",virgula=F){
-  require(stringr)
   nf=""
   vari=unlist(vari)
   if(length(summary(vari))==6) {N=length(vari); na=0} else {N=length(vari);na=summary(vari)[7]}
@@ -55,7 +54,6 @@ desc_uni_continua <- function(vari,nome,bins=20,texto=T, grafico=T,cor='cyan4',d
   d <- data.frame("Característica"=parametros,"Estatística"=unlist(variavel))
   tex=NULL
 
-
   outl = length(boxplot.stats(na.omit(vari))$out)
 
   missings = as.numeric(d$Estatística[1])-as.numeric(d$Estatística[3])
@@ -70,11 +68,11 @@ desc_uni_continua <- function(vari,nome,bins=20,texto=T, grafico=T,cor='cyan4',d
   if(texto==T){
     if(nf=="") nf=c("  + O teste de shapiro wilk, com p-valor ",rej," a hipótese de normalidade dos dados (W=",round(shap$statistic,digitos),", p-valor=",magicR::pvalor(shap$p.value),"). \n") else shaptexto=nf
     if(cv>50) cvtexto = " Como isso não ocorreu, valores próximos à média podem não ter sido tão frequentes nos dados. \n" else cvtexto = " Como isso ocorreu, os dados tendem a se concentrar perto da média. \n"
-    dif=as.numeric(d$Estatística[7])-as.numeric(d$Estatística[6])
-    simetria = 5*(dif)/as.numeric(d$Estatística[8])
+    dife=as.numeric(d$Estatística[7])-as.numeric(d$Estatística[6])
+    simetria = 5*(dife)/as.numeric(d$Estatística[8])
     if(abs(simetria) > 1) { if(simetria >0) qt = "é significativa, indicando assimetria com concentração à esquerda e cauda à direita." else qt = "é significativa, indicando assimetria com concentração à direita e cauda à esquerda."} else qt = "não é significativa, indicando simetria."
     if(d$Estatística[1]==d$Estatística[3]) {tex <- c("* **",nome,": ** A variável '",nome,"' não teve perda de dados, também chamada de *\"missings\"*, portanto todas as ",d$Estatística[1]," linhas do banco estão preenchidas.")} else
-    {nr=eval(parse(text=str_sub(str_split(d$Estatística[2]," ")[[1]][2],2,-3)))
+    {nr=eval(parse(text=stringr::str_sub(str_split(d$Estatística[2]," ")[[1]][2],2,-3)))
     if(nr<=5) miss <- c("Como há menos de 5% de *missings* (",nr,"%), não há motivos para se preocupar com a ausência de dados.") else { if(nr<20) miss <- c("Como as não respostas representam ",nr,"% das linhas, cabe perguntar-se se há algum tipo de viés (algum fator que influenciou essa ausência de forma sistemática).") else miss <- c("Ressaltamos que há uma grande quantidade de não respostas para essa variável (",nr,"%), por isso recomendamos que algum tipo de explicação seja dada pela ausência desses dados.")}
     tex <- c("* **",nome,": ** Das ",d$Estatística[1]," linhas presentes no banco de dados, houve ",str_split(d$Estatística[2]," ")[[1]][1], " não respostas,  também chamada \"missings\". Assim, totalizamos ",d$Estatística[3]," observações no banco de dados. ", miss," \n")}
     tex <- c(tex, " Passamos a avaliar como os valores estão distribuídos: \n")
@@ -86,7 +84,7 @@ desc_uni_continua <- function(vari,nome,bins=20,texto=T, grafico=T,cor='cyan4',d
              nf)
     tex=paste(tex,collapse="")} else tex=NULL
 
-  if(grafico==T) grafico=graficos_continua(vari,nome,20,cor,digitos,idioma,virgula) else grafico=NULL
+  if(grafico==T) grafico=magicR::graficos_continua(vari,nome,20,cor,digitos,idioma,virgula) else grafico=NULL
 
   testes = data.frame(Nome1 = "", Nome2 = nome, tipo = "numeric", sig_ou_não = '-', resumo = inter_resumo, sup = NA)
 
@@ -122,11 +120,6 @@ desc_uni_continua <- function(vari,nome,bins=20,texto=T, grafico=T,cor='cyan4',d
 graficos_continua = function (var, nome, bins = 20, cor = "cyan4", digitos = 2, idioma = "PT",
                               virgula = F,xmin='auto',xmax='auto')
 {
-  require(ggplot2)
-  require(colorspace)
-  require(ggthemes)
-  require(patchwork)
-  require(ggrepel)
   d <- data.frame(var = as.numeric(unlist(var)))
   excess <- round((max(d$var, na.rm = T) - min(d$var, na.rm = T))/8,
                   0)
@@ -152,7 +145,7 @@ graficos_continua = function (var, nome, bins = 20, cor = "cyan4", digitos = 2, 
           plot.title = element_text(hjust = 0.5),
           plot.background = element_rect(colour = "white")) +
     xlim(min,max) +
-    geom_label_repel(data = data.frame("x" = c(summary(var)[c(1:3,5,6)]),
+    ggrepel::geom_label_repel(data = data.frame("x" = c(summary(var)[c(1:3,5,6)]),
                                        "y" = c(-0.2,0.1,-0.1,0.1,-0.2),
                                        "label" = ponto_para_virgula(paste0(c("Min=","Q1=","Med=","Q3=","Max="), round(summary(var)[c(1:3,5,6)],digitos)), virgula)),
                      aes(x = x, y = y, label = label),

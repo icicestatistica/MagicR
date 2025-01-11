@@ -8,5 +8,15 @@ Description: Este pacote contém funções úteis para análises estatísticas.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Depends:
+    R (>= 3.5.0),
+    ggplot2,
+    dplyr,
+    patchwork
+Imports:
+    tidyr,
+    stringr,
+    colorspace,
+    ggthemes,
+    ggrepel
 RoxygenNote: 7.3.1
-
