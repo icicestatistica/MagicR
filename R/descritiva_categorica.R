@@ -47,7 +47,7 @@ grafico_categorica <- function(var,nome, niveis='auto', cor='cyan4', ordenar=T,v
     if(length(niveis) > 2) {
       result <- na.omit(tab) %>% mutate(var=fct_reorder(var, desc(Freq))) %>%
         ggplot() + geom_bar(aes(x=var,y=Freq),fill=cor,stat="identity")  +
-        ylim(0,max(table(var))*1.1)+ggthemes::theme_clean()  + ylab("") + xlab("") + ggtitle(paste0(vetor_comsep_c(nome,50)," (n=",length(na.omit(var)),")",collapse=""))+            geom_text(aes(x=var,y=Freq),label=ponto_para_virgula(tab$perc,virgula),vjust=-0.5) +
+        ylim(0,max(table(var))*1.1)+ ggthemes::theme_clean()  + ylab("") + xlab("") + ggtitle(paste0(vetor_comsep_c(nome,50)," (n=",length(na.omit(var)),")",collapse=""))+            geom_text(aes(x=var,y=Freq),label=ponto_para_virgula(tab$perc,virgula),vjust=-0.5) +
         theme(
           plot.background = element_rect(colour="white"),
           axis.text.x=element_text(size=12),
@@ -131,7 +131,7 @@ grafico_categorica_vert = function (var, nome, niveis = "auto", cor = "cyan4", o
     ggplot(aes(y = var, x = Freq_rel)) +
     geom_bar(stat = "identity",fill = cor) +
     theme_icic("v") +
-    geom_text(aes(label = ponto_para_virgula(paste0(Freq," (",100 *round(Freq_rel, 2), "%)"), virgula),x=Freq_rel+max(df$Freq_rel)/10)) +
+    geom_text(aes(label = ponto_para_virgula(paste0(Freq," (",100 *round(Freq_rel, 2), "%)"), virgula),x=Freq_rel+max(Freq_rel)/10)) +
     scale_x_continuous(labels = scales::percent_format(),
                        expand = expansion(mult = c(0, 0.05)), limits=c(0,max(df$Freq_rel)+0.13)) +
     labs(y = NULL,x = "Proporção",
