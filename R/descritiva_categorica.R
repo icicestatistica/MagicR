@@ -128,7 +128,7 @@ grafico_categorica_vert = function (var, nome, niveis = "auto", cor = "cyan4", o
   plot = df %>%
     ggplot(aes(y = var, x = Freq_rel)) +
     geom_bar(stat = "identity",fill = cor) +
-    theme_icic("v") +
+    magicR::theme_icic("v") +
     geom_text(aes(label = ponto_para_virgula(paste0(Freq," (",100 *round(Freq_rel, 2), "%)"), virgula),x=Freq_rel+max(Freq_rel)/10)) +
     scale_x_continuous(labels = scales::percent_format(),
                        expand = expansion(mult = c(0, 0.05)), limits=c(0,max(df$Freq_rel)+0.13)) +
@@ -136,3 +136,110 @@ grafico_categorica_vert = function (var, nome, niveis = "auto", cor = "cyan4", o
          title = vetor_comsep_c(paste(nome," (n=", length(na.omit(var)), ")", sep = ""), 50))
   return(plot)
 }
+
+#' quiqua_aderencia
+#'
+#' Executa o teste qui-quadrado de aderência para verificar se as frequências observadas em uma variável categórica diferem significativamente de frequências esperadas iguais entre as categorias. Também calcula os resíduos padronizados e identifica categorias com frequências significativamente maiores ou menores.
+#'
+#' @param vetor Vetor ou lista contendo a variável categórica a ser analisada.
+#' @param nomecat Nome da variável categórica para uso nos textos descritivos.
+#' @param niveis Ordem dos níveis da variável categórica. Padrão é `"auto"`, que utiliza os níveis da variável.
+#' @param ordenar Lógico. Se `TRUE`, os resultados são ordenados por resíduos padronizados. Padrão: `TRUE`.
+#' @param dig Número de casas decimais para arredondamento. Padrão: `2`.
+#'
+#' @return Um objeto `list` com os seguintes elementos:
+#' \item{texto}{Texto interpretativo do teste qui-quadrado e dos resíduos. Inclui significância, estatística do teste, V de Cramer (cramer_v pacote rstatix) e detalhes dos resíduos significativos.}
+#' \item{tabela}{Data frame contendo:}
+#' \tabular{ll}{
+#'   \strong{Categoria} \tab \strong{Descrição} \cr
+#'   Categoria \tab Os níveis da variável categórica. \cr
+#'   Frequência observada \tab Proporção observada de cada categoria. \cr
+#'   IC 95% \tab Intervalo de confiança da proporção. \cr
+#'   Resíduos padronizados \tab Diferença entre as proporções observadas e esperadas, ajustada. \cr
+#'   p-valor \tab Significância estatística dos resíduos, considerando a correção de Bonferroni. Resíduos significativos têm um `*`. \cr
+#' }
+#'
+#' @examples
+#' # Dados fictícios
+#' dados <- sample(c("A", "B", "C"), size = 50, replace = TRUE, prob = c(0.1, 0.5, 0.4))
+#'
+#' # Rodando o teste qui-quadrado de aderência
+#' resultado <- quiqua_aderencia(vetor = dados, nomecat = "Categorias")
+#'
+#' # Gerando o relatório
+#' relatorio(resultado,pularprimeiro=F)
+#'
+#' @note
+#' - Quando o número de categorias é grande, o teste pode perder poder devido ao ajuste para comparações múltiplas.
+#' - As interpretações do tamanho do efeito baseiam-se no V de Cramer e variam com o número de graus de liberdade.
+#' - Caso a variável tenha apenas uma categoria, a função retorna uma mensagem informando a impossibilidade de realizar o teste.
+#' - As funções `chisq.test` e `prop.test` são usadas para o cálculo do teste qui-quadrado e dos intervalos de confiança, respectivamente.
+#' - A função `cramer_v` (do pacote `rstatix`) é utilizada para calcular o efeito do teste.
+#'
+#' @import stringr rstatix knitr
+#' @export
+quiqua_aderencia <- function(vetor,nomecat,niveis='auto',ordenar=T,dig=2){
+  vetor = unlist(vetor)
+  if(niveis[1]=='auto') niveis = names(table(vetor))
+  vetor <- factor(vetor,levels=niveis)
+
+  a=NULL
+  texto2=c()
+  tabela <- table(vetor)
+  gl=length(tabela)-1
+  if(gl==0) {texto=paste0(" * **",nomecat,":** Não é possível realizar testes estatísticos em variáveis com apenas uma categoria de resposta. \n",sep="")} else {
+
+    quiqua <- chisq.test(tabela)
+
+    ic <- c()
+    for (i in 1:length(tabela)) {ic <- rbind(ic,paste("(",paste(round(100*prop.test(x=as.vector(tabela)[i],n=length(vetor),p=1/length(tabela))$conf.int[1:2],2),collapse="%, "),"%)",sep=""))}
+
+    ef=round(rstatix::cramer_v(tabela, p = rep(1/length(tabela),length(tabela))),dig)
+
+    if(gl==1){
+      if(ef<0.1) efeito="pode ser considerado desprezível." else
+        if(ef<0.3) efeito="pode ser considerado um efeito pequeno." else
+          if(ef<0.5) efeito="pode ser considerado um efeito médio." else
+            efeito="pode ser considerado um efeito grande."} else
+            {if(gl==2){
+              if(ef<0.07) efeito="pode ser considerado desprezível." else
+                if(ef<0.21) efeito="pode ser considerado um efeito pequeno." else
+                  if(ef<0.35) efeito="pode ser considerado um efeito médio." else
+                    efeito="pode ser considerado um efeito grande."} else
+                    {if(ef<0.06) efeito="pode ser considerado desprezível." else
+                      if(ef<0.17) efeito="pode ser considerado um efeito pequeno." else
+                        if(ef<0.29) efeito="pode ser considerado um efeito médio." else
+                          efeito="pode ser considerado um efeito grande."}}
+
+    if(quiqua$p.value>0.05) texto = paste0("* **",nomecat,":** O teste qui-quadrado de aderência apontou que não devemos rejeitar a hipótese de igualdade entre as frequências de todas as categorias (",paste("$\\chi^2$",collapse=NULL,sep=""),"(",quiqua$parameter,") = ", round(quiqua$statistic,dig),", p=", magicR::pvalor(quiqua$p.value),", V de Cramer=",ef,"). Assim, não rejeitamos que ",paste(paste("a proporção de ",names(tabela),sep=""),collapse=" é igual ")," = 1/",length(tabela)," = **",round(100*1/length(tabela),dig),"%**. O efeito foi medido pela estatística V de Cramer (",ef,"), que ",efeito," \n") else
+      texto = paste0(" * **",nomecat,":** Através do teste qui-quadrado de aderência, rejeitamos a hipótese de igualdade entre todas as frequências (",paste("$\\chi^2$",collapse=NULL),"(",quiqua$parameter,") = ", round(quiqua$statistic,dig),", p=", magicR::pvalor(quiqua$p.value),", V de Cramer=",ef,"). Isso significa que pelo menos uma frequência difere de 1/",length(tabela)," = **",round(100*1/length(tabela),dig),"%**.  O efeito foi medido pela estatística V de Cramer (",ef,"), que ",efeito, " Passamos a analisar os resíduos do teste qui-quadrado para encontrar quais frequências não são compatíveis com a frequência esperada (",round(100*1/length(tabela),dig),"%). Tomando como base uma significância de 5%, como temos ",length(tabela)," categorias, o ponto de corte $\\alpha$ utilizado será 0.05/",length(tabela),"=",round(0.05/length(tabela),4),", resultando num valor crítico (bilateral) de ",abs(round(qnorm((0.05/length(tabela))/2),dig)),". Portanto, resíduos padronizados ajustados fora da região (",round(qnorm((0.05/length(tabela))/2),dig),",",-round(qnorm((0.05/length(tabela))/2),dig),") serão considerados estatisticamente significativos. Complementando a análise, calculamos o p-valor de cada resíduo. Lembrando que agora, utilizaremos o novo $\\alpha$ (",round(0.05/length(tabela),4),"), ou seja, o resíduo será considerado estatisticamente significativo se o p-valor for menor do que esse valor.")
+
+    if (quiqua$p.value<0.05){
+      a=data.frame(names(tabela),paste0(round(100*prop.table(tabela),dig),"%"),"IC 95%"=ic,"`Resíduos padronizados ajustados`"=round(quiqua$stdres,dig),
+                   "p-valor"=round(2*(1-pnorm(abs(quiqua$stdres))),3))[,-c(4,6)]
+      names(a)=c("Categoria","Frequência observada","IC 95%","Resíduos padronizados","p-valor")
+      if(ordenar==T) a=a[order(a$`Resíduos padronizados`,decreasing=T),]
+
+      a$`p-valor`[a$`p-valor`<0.001] <- "<0.001*"
+      a$`p-valor`[a$`p-valor`<(0.05/length(tabela))] <- paste0(a$`p-valor`[a$`p-valor`<(0.05/length(tabela))],"*")
+
+
+      maior=c();menor=c();nula=c()
+
+      for (i in 1:(dim(a)[1])) {if(stringr::str_sub(a$`p-valor`[i],-1)=="*" & a$`Resíduos padronizados`[i]>0) maior <- c(maior,a$Categoria[i]) else
+        if(stringr::str_sub(a$`p-valor`[i],-1)=="*" & a$`Resíduos padronizados`[i]<0) menor <- c(menor,a$Categoria[i]) else nula <- c(nula,a$Categoria[i])
+      }
+
+      texto2=c(texto2," Através da análise de resíduos, concluimos que: \n")
+      if(length(maior)==1) texto2 <- c(texto2,c("  + A categoria ",magicR::printvetor(maior)," possui frequência **maior** do que era esperado sob hipótese de igualdade de proporções. \n"))
+      if(length(maior)>1) texto2 <- c(texto2,c("  + As categorias ",magicR::printvetor(maior)," possuem frequência **maior** do que era esperado sob hipótese de igualdade de proporções."),"\n")
+      if(length(menor)==1) texto2 <- c(texto2,c("  + A categoria ",magicR::printvetor(menor)," possui frequência **menor** do que era esperado sob hipótese de igualdade de proporções."),"\n")
+      if(length(menor)>1) texto2 <- c(texto2,c("  + As categorias ",magicR::printvetor(menor)," possuem frequência **menor** do que era esperado sob hipótese de igualdade de proporções."),"\n")
+      if(length(nula)==1) texto2 <- c(texto2,c("  + A categoria ",magicR::printvetor(nula)," **não difere** estatisticamente da frequência esperada sob hipótese de igualdade de proporções."),"\n") else {
+        if(length(nula)==(dim(a)[1])) texto2 <- c(texto2,c("  + Apesar do teste ser significativo globalmente, nenhuma das categorias diferem estatisticamente da frequência esperada sob hipótese de igualdade de proporções."),"\n") else {
+          if(length(nula)>1) texto2 <- c(texto2,c("  + As categorias ",magicR::printvetor(nula)," **não diferem** estatisticamente da frequência esperada sob hipótese de igualdade de proporções."),"\n")}}
+      texto2 <- c(texto2,"\n Podemos verificar o valor dos resíduos na tabela a seguir: \n")
+    }}
+  resultado=list("texto"=paste(c(texto,texto2,"\n"),collapse=" "),"tabela"=a)
+
+  return(resultado)}

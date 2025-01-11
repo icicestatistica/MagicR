@@ -108,46 +108,46 @@ relatorio <- function(a, pularprimeiro = TRUE, dig = 2) {
 #' Esta função define um tema customizado baseado no \code{ggthemes::theme_clean()},
 #' com ajustes específicos para facilitar a visualização de gráficos horizontais
 #' ou verticais. O tema modifica o fundo, as grades e o alinhamento de textos no gráfico.
-#' 
+#'
 #' @param sentido string (opcional, padrão = "v") Determina a orientação do gráfico:
 #'  \code{"v"} para gráficos verticais e \code{"h"} para gráficos horizontais.
-#' 
+#'
 #' @details
-#' O tema \code{theme_icic} é projetado para melhorar a apresentação de gráficos 
+#' O tema \code{theme_icic} é projetado para melhorar a apresentação de gráficos
 #' criados com o pacote \code{ggplot2}. Ele inclui:
 #' - Fundo transparente para o painel e o gráfico.
 #' - Título e subtítulo centralizados.
 #' - Ajustes nas grades principais:
 #'   - Para gráficos verticais (\code{sentido = "v"}): grades verticais com linhas pontilhadas.
 #'   - Para gráficos horizontais (\code{sentido = "h"}): grades horizontais com linhas pontilhadas.
-#' 
+#'
 #' @return
 #' Um objeto \code{theme} do pacote \code{ggplot2} que pode ser aplicado diretamente
 #' a um gráfico \code{ggplot}.
-#' 
+#'
 #' @examples
 #' library(ggplot2)
-#' 
+#'
 #' dados = rnorm(100,50,10)
-#' 
+#'
 #' # Aplicando o tema em gráficos verticais
 #' p <- ggplot(NULL, aes(x=dados)) +
 #'      geom_histogram()
-#'    
+#'
 #' p1 = p + theme_icic(sentido = "v")
 #' print(p1)
-#' 
+#'
 #' # Aplicando o tema em gráficos horizontais
 #' p <- ggplot(NULL, aes(x=dados)) +
 #'      geom_histogram()
-#'    
+#'
 #' p2 = p + theme_icic(sentido = "y")
 #' print(p2)
 #' @import ggthemes
 #' @keywords internal
 theme_icic <- function(sentido = "v") {
   if (sentido == "h") {
-    add <- ggthemes::theme_clean() + 
+    add <- ggthemes::theme_clean() +
       ggplot2::theme(
         plot.background = element_rect(colour = NA),
         panel.background = element_rect(fill = "transparent", color = NA),
@@ -159,7 +159,7 @@ theme_icic <- function(sentido = "v") {
       )
   }
   if (sentido == "v") {
-    add <- ggthemes::theme_clean() + 
+    add <- ggthemes::theme_clean() +
       ggplot2::theme(
         plot.background = element_rect(colour = NA),
         panel.background = element_rect(fill = "transparent", color = NA),
@@ -171,5 +171,62 @@ theme_icic <- function(sentido = "v") {
       )
   }
   return(add)
+}
+
+#' printvetor
+#'
+#' Esta função formata e retorna um vetor como uma string, unindo seus elementos
+#' com uma conjunção apropriada, dependendo do idioma (Português ou Inglês). A função
+#' também permite adicionar aspas ao redor dos elementos do vetor, caso desejado.
+#'
+#' @param vetor Vetor de caracteres a ser impresso. Os elementos serão unidos
+#' através de uma conjunção.
+#' @param idioma Idioma utilizado na conjunção entre os elementos. Pode ser
+#' "PT" para português (padrão) ou "EN" para inglês.
+#' @param aspas Lógico. Se `TRUE`, coloca aspas ao redor dos elementos. O valor
+#' padrão é `TRUE`.
+#'
+#' @details
+#' A função \code{printvetor} é útil para gerar listagens formatadas de itens,
+#' com a possibilidade de ajustar a conjunção ("e" ou "and") e a formatação
+#' (com ou sem aspas) dos elementos do vetor. Quando o vetor contém apenas um
+#' elemento, ele é retornado sem a conjunção.
+#'
+#' @return
+#' Uma string com os elementos do vetor unidos com a conjunção apropriada, e com
+#' ou sem aspas, dependendo do valor do parâmetro \code{aspas}.
+#'
+#' @examples
+#' vetor_exemplo <- c("maçã", "banana", "laranja")
+#'
+#' # Imprimindo os elementos com aspas e em português
+#' printvetor(vetor_exemplo, idioma = "PT", aspas = TRUE)
+#'
+#' # Imprimindo os elementos sem aspas e em inglês
+#' printvetor(vetor_exemplo, idioma = "EN", aspas = FALSE)
+#'
+#' @keywords internal
+printvetor <- function(vetor, idioma="PT", aspas=TRUE) {
+  size <- length(vetor)
+  if (size == 0) {
+    print <- ""
+  } else {
+    if (aspas == TRUE) {
+      conec <- ifelse(idioma == "PT", "' e '", "' and '")
+      if (size == 1) {
+        print <- paste0("'", vetor[1], "'")
+      } else {
+        print <- paste(paste("'", vetor[1:(size - 1)], collapse="', ", sep=""), conec, vetor[size], "'", collapse=NULL, sep="")
+      }
+    } else {
+      conec <- ifelse(idioma == "PT", " e ", " and ")
+      if (size == 1) {
+        print <- paste0(vetor[1])
+      } else {
+        print <- paste(paste(vetor[1:(size - 1)], collapse=", ", sep=""), conec, vetor[size], collapse=NULL, sep="")
+      }
+    }
+  }
+  return(print)
 }
 

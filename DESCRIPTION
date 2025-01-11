@@ -18,5 +18,7 @@ Imports:
     stringr,
     colorspace,
     ggthemes,
-    ggrepel
+    ggrepel,
+    knitr,
+    rcompanion
 RoxygenNote: 7.3.1

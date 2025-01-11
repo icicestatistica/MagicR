@@ -20,7 +20,7 @@ com ajustes específicos para facilitar a visualização de gráficos horizontai
 ou verticais. O tema modifica o fundo, as grades e o alinhamento de textos no gráfico.
 }
 \details{
-O tema \code{theme_icic} é projetado para melhorar a apresentação de gráficos 
+O tema \code{theme_icic} é projetado para melhorar a apresentação de gráficos
 criados com o pacote \code{ggplot2}. Ele inclui:
 - Fundo transparente para o painel e o gráfico.
 - Título e subtítulo centralizados.
@@ -36,14 +36,14 @@ dados = rnorm(100,50,10)
 # Aplicando o tema em gráficos verticais
 p <- ggplot(NULL, aes(x=dados)) +
      geom_histogram()
-   
+
 p1 = p + theme_icic(sentido = "v")
 print(p1)
 
 # Aplicando o tema em gráficos horizontais
 p <- ggplot(NULL, aes(x=dados)) +
      geom_histogram()
-   
+
 p2 = p + theme_icic(sentido = "y")
 print(p2)
 }
