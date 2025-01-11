@@ -234,3 +234,129 @@ quiqua_aderencia <- function(vetor,nomecat,niveis='auto',ordenar=T,dig=2){
   resultado=list("texto"=paste(c(texto,texto2,"\n"),collapse=" "),"tabela"=a)
 
   return(resultado)}
+
+#' Descrição univariada de variável categórica
+#'
+#' Esta função realiza uma análise descritiva univariada para variáveis categóricas, incluindo tabelas de frequência, 
+#' interpretação textual e gráficos. 
+#'
+#' @param variavel Vetor ou lista contendo a variável categórica a ser analisada.
+#' @param nome Nome da variável categórica para uso nos textos descritivos.
+#' @param niveis Ordem dos níveis da variável categórica. Padrão é `"auto"`, que utiliza os níveis detectados na variável.
+#' @param nas Lógico. Se `TRUE`, inclui as frequências de valores ausentes (NA) na tabela. Padrão: `FALSE`.
+#' @param label Lógico. Se `TRUE`, adiciona uma coluna com frequência absoluta e relativa concatenadas. Padrão: `FALSE`.
+#' @param ordenar Lógico. Se `TRUE`, ordena os resultados em ordem decrescente de frequência. Padrão: `TRUE`.
+#' @param acumula Lógico. Se `TRUE`, adiciona uma coluna com frequência acumulada. Padrão: `TRUE`.
+#' @param teste Lógico. Se `TRUE`, executa o teste qui-quadrado de aderência na variável categórica. Padrão: `FALSE`.
+#' @param grafico Lógico. Se `TRUE`, gera um gráfico de barras para a variável categórica. Padrão: `TRUE`.
+#' @param cor Cor a ser utilizada no gráfico de barras. Padrão: `"cyan4"`.
+#' @param digitos Número de casas decimais para arredondamento. Padrão: `2`.
+#' @param virgula Lógico. Se `TRUE`, utiliza vírgula como separador decimal. Padrão: `FALSE`.
+#' 
+#' @details
+#' A função produz:
+#' - Uma tabela com frequência absoluta, relativa e opcionalmente acumulada.
+#' - Um texto descritivo interpretativo da variável categórica.
+#' - Opcionalmente, um gráfico de barras para visualização.
+#' 
+#' Se o parâmetro `teste` for ativado, realiza-se o teste qui-quadrado de aderência para verificar se a distribuição da variável é uniforme.
+#' 
+#' @return Um objeto `list` contendo os seguintes elementos:
+#' 
+#' - **testes**: Data frame com informações sobre o teste realizado.
+#' - **result**: Data frame com as seguintes colunas (dependendo dos parâmetros):
+#'   - `Característica`: Os níveis da variável categórica.
+#'   - `Frequência`: Contagem absoluta de cada nível.
+#'   - `Freq. Relativa`: Porcentagem relativa de cada nível.
+#'   - `Freq.`: Combinação de frequência absoluta e relativa (se `label = TRUE`).
+#'   - `Freq. Acumulada`: Frequência acumulada em valores absolutos e relativos (se `acumula = TRUE`).
+#' - **texto**: Texto interpretativo sobre os grupos da variável categórica.
+#' - **interp**: Interpretação textual mais detalhada sobre a variável.
+#' - **tabela**: Resultado do teste qui-quadrado, se aplicável.
+#' - **grafico**: Objeto gráfico (ggplot2) com o gráfico de barras.
+#' 
+#' @examples
+#' # Criando um vetor categórico de exemplo
+#' variavel <- sample(c("A", "B", "C"), size = 100, replace = TRUE, prob = c(0.2, 0.5, 0.3))
+#' 
+#' # Analisando a variável categórica
+#' resultado <- desc_uni_categorica(
+#'   variavel = variavel,
+#'   nome = "Exemplo",
+#'   ordenar = TRUE,
+#'   teste = TRUE,
+#'   grafico = TRUE
+#' )
+#' 
+#' relatorio(resultado)
+#' 
+#' @export
+desc_uni_categorica <- function(variavel, nome, niveis = 'auto', nas = FALSE, label = FALSE, 
+                                ordenar = TRUE, acumula = TRUE, teste = FALSE, grafico = TRUE, 
+                                cor = "cyan4", digitos = 2, virgula = FALSE) {
+  variavel <- unlist(variavel)
+  if (niveis[1] == 'auto') niveis <- names(table(variavel))
+  variavel <- factor(variavel, levels = niveis)
+  
+  tablevar <- table(variavel)
+  if (ordenar) tablevar <- table(factor(variavel, levels = names(tablevar)[order(tablevar, decreasing = TRUE)]))
+  prop <- 100 * round(prop.table(tablevar), 3)
+  
+  res <- c()
+  for (i in 1:(length(tablevar) - 1)) 
+    res <- c(res, paste(names(tablevar)[i], " (", prop[i], "%)", sep = ""))
+  descri <- paste(paste(res, collapse = ", "), " e ", 
+                  paste(names(tablevar)[length(tablevar)], " (", prop[length(tablevar)], "%).", sep = ""))
+  
+  interpretacao <- paste(" + Em relação à variável **'", nome, "'**, tivemos os grupos ", descri, sep = "")
+  interp_resumo <- paste(nome, " se dividiu nos grupos ", descri, sep = "")
+  
+  if (!nas) {
+    d <- data.frame(t(rbind(round(tablevar, 0), paste0(round(100 * prop.table(tablevar), digitos), "%"))))
+  } else {
+    d <- t(rbind(round(tablevar, 0), paste0(round(100 * tablevar / length(variavel), digitos), "%")))
+    d <- rbind(d, "N/A" = c(sum(is.na(variavel)), paste0(round(100 * sum(is.na(variavel)) / length(variavel), digitos), "%")))
+  }
+  
+  if (ordenar) d <- d[order(as.numeric(d[, 1]), decreasing = TRUE), ]
+  if (label) d <- data.frame(d, "Freq." = paste0(d[, 1], " (", d[, 2], ")"))
+  if (acumula) 
+    d <- data.frame(d, "Freq. Relativa Acumulada" = paste0(cumsum(d[, 1]), " (", 
+                                                           round(100 * cumsum(d[, 1]) / (cumsum(d[, 1])[nrow(d)]), digitos), "%)"))
+  
+  d <- data.frame(row.names(d), d)
+  colnames(d) <- c("Característica", "Frequência", "Freq. Relativa", "Freq.", "Freq. Acumulada")[c(TRUE, TRUE, TRUE, label, acumula)]
+  row.names(d) <- NULL
+  
+  if (!teste) {
+    testectexto <- NULL
+    testectabela <- NULL
+  } else {
+    testec <- magicR::quiqua_aderencia(variavel, nome, niveis, ordenar, digitos)
+    if (length(testec) == 1) {
+      testectexto <- testec$texto
+      testectabela <- NULL
+    } else {
+      testectexto <- testec$texto
+      testectabela <- testec$tabela
+    }
+  }
+  
+  if (grafico) {
+    if (sum(nchar(niveis)) < 80) 
+      graficoc <- magicR::grafico_categorica(variavel, nome, niveis, cor, ordenar, virgula)
+    else 
+      graficoc <- magicR::grafico_categorica_vert(variavel, nome, niveis, cor, ordenar, virgula)
+  } else {
+    graficoc <- NULL
+  }
+  
+  testes <- data.frame(Nome1 = "", Nome2 = nome, tipo = ifelse(ordenar, "factor", "ordinal"), 
+                       sig_ou_não = '-', resumo = interp_resumo, sup = NA)
+  
+  resultados <- list("testes" = testes, "result" = d, "texto" = testectexto, 
+                     "interp" = interpretacao, "tabela" = testectabela, "grafico" = graficoc)
+  
+  return(resultados)
+}
+
