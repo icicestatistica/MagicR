@@ -20,5 +20,5 @@ Imports:
     ggthemes,
     ggrepel,
     knitr,
-    rcompanion
+    rstatix
 RoxygenNote: 7.3.1

@@ -34,11 +34,11 @@ Um objeto `list` com os seguintes elementos:
 Executa o teste qui-quadrado de aderência para verificar se as frequências observadas em uma variável categórica diferem significativamente de frequências esperadas iguais entre as categorias. Também calcula os resíduos padronizados e identifica categorias com frequências significativamente maiores ou menores.
 }
 \note{
-- Quando o número de categorias é grande, o teste pode perder poder devido ao ajuste para comparações múltiplas.
-- As interpretações do tamanho do efeito baseiam-se no V de Cramer e variam com o número de graus de liberdade.
-- Caso a variável tenha apenas uma categoria, a função retorna uma mensagem informando a impossibilidade de realizar o teste.
-- As funções `chisq.test` e `prop.test` são usadas para o cálculo do teste qui-quadrado e dos intervalos de confiança, respectivamente.
-- A função `cramer_v` (do pacote `rstatix`) é utilizada para calcular o efeito do teste.
+\item Quando o número de categorias é grande, o teste pode perder poder devido ao ajuste para comparações múltiplas.
+\item As interpretações do tamanho do efeito baseiam-se no V de Cramer e variam com o número de graus de liberdade.
+\item Caso a variável tenha apenas uma categoria, a função retorna uma mensagem informando a impossibilidade de realizar o teste.
+\item As funções `chisq.test` e `prop.test` são usadas para o cálculo do teste qui-quadrado e dos intervalos de confiança, respectivamente.
+\item A função `cramer_v` (do pacote `rstatix`) é utilizada para calcular o efeito do teste.
 }
 \examples{
 # Dados fictícios
