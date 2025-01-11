@@ -90,8 +90,6 @@ desc_uni_continua <- function(vari,nome,bins=20,texto=T, grafico=T,cor='cyan4',d
 
   return(list("testes"=testes,"result"=d,"texto"=tex,"interp"=interpretacao,"grafico"=grafico))}
 
-
-
 #' Função para Gerar Gráficos de Variáveis Contínuas
 #'
 #' Esta função gera gráficos de boxplot e histograma para visualizar a distribuição de uma variável contínua.
@@ -129,8 +127,8 @@ graficos_continua = function (var, nome, bins = 20, cor = "cyan4", digitos = 2, 
   media = mean(d$var, na.rm = T)
   if (idioma == "PT") medianomegraf = "Média=" else medianomegraf = "Mean="
   box <- ggplot(d) +
-    geom_boxplot(aes(x = var), fill = lighten(cor,0.2)) +
-    theme_clean() +
+    geom_boxplot(aes(x = var), fill = colorspace::lighten(cor,0.2)) +
+    ggthemes::theme_clean() +
     ggtitle(vetor_comsep_c(paste0(nome," (n=", length(d$var[!is.na(d$var)]), ")"), 40)) +
     labs(x="",y="") +
     theme(axis.text.y = element_blank(),
@@ -155,10 +153,10 @@ graficos_continua = function (var, nome, bins = 20, cor = "cyan4", digitos = 2, 
     geom_histogram(aes(y = after_stat(density)), bins = bins, fill = cor) +
     geom_density(colour = NA, fill = cor, alpha = 0.5) +
     geom_errorbarh(data=data.frame("mmax"=c(media+dp),"mmin"=c(media-dp),"y"=c(0),"h"=max(density(d$var,na.rm = T)$y)/5),aes(xmax = mmax, xmin = mmin, y = y, height = h),inherit.aes = FALSE) +
-    theme_clean() +
+    ggthemes::theme_clean() +
     labs(x=nome,y="") +
     coord_cartesian(xlim = c(min, max)) +
-    geom_vline(xintercept = media,color = "black", size = 1) +
+    geom_vline(xintercept = media,color = "black", linewidth = 1) +
     theme(axis.text.y = element_blank(),
           axis.ticks.y = element_blank(),
           axis.line.y = element_blank(),
