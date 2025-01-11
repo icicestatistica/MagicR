@@ -103,4 +103,73 @@ relatorio <- function(a, pularprimeiro = TRUE, dig = 2) {
 }
 
 
+#' Tema customizado para gráficos do ggplot2
+#'
+#' Esta função define um tema customizado baseado no \code{ggthemes::theme_clean()},
+#' com ajustes específicos para facilitar a visualização de gráficos horizontais
+#' ou verticais. O tema modifica o fundo, as grades e o alinhamento de textos no gráfico.
+#' 
+#' @param sentido string (opcional, padrão = "v") Determina a orientação do gráfico:
+#'  \code{"v"} para gráficos verticais e \code{"h"} para gráficos horizontais.
+#' 
+#' @details
+#' O tema \code{theme_icic} é projetado para melhorar a apresentação de gráficos 
+#' criados com o pacote \code{ggplot2}. Ele inclui:
+#' - Fundo transparente para o painel e o gráfico.
+#' - Título e subtítulo centralizados.
+#' - Ajustes nas grades principais:
+#'   - Para gráficos verticais (\code{sentido = "v"}): grades verticais com linhas pontilhadas.
+#'   - Para gráficos horizontais (\code{sentido = "h"}): grades horizontais com linhas pontilhadas.
+#' 
+#' @return
+#' Um objeto \code{theme} do pacote \code{ggplot2} que pode ser aplicado diretamente
+#' a um gráfico \code{ggplot}.
+#' 
+#' @examples
+#' library(ggplot2)
+#' 
+#' dados = rnorm(100,50,10)
+#' 
+#' # Aplicando o tema em gráficos verticais
+#' p <- ggplot(NULL, aes(x=dados)) +
+#'      geom_histogram()
+#'    
+#' p1 = p + theme_icic(sentido = "v")
+#' print(p1)
+#' 
+#' # Aplicando o tema em gráficos horizontais
+#' p <- ggplot(NULL, aes(x=dados)) +
+#'      geom_histogram()
+#'    
+#' p2 = p + theme_icic(sentido = "y")
+#' print(p2)
+#' 
+#' @keywords internal
+theme_icic <- function(sentido = "v") {
+  if (sentido == "h") {
+    add <- ggthemes::theme_clean() + 
+      ggplot2::theme(
+        plot.background = element_rect(colour = NA),
+        panel.background = element_rect(fill = "transparent", color = NA),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        legend.background = element_rect(color = NA),
+        panel.grid.major.y = element_line(linetype = 3, color = 'gray'),
+        panel.grid.major.x = element_blank()
+      )
+  }
+  if (sentido == "v") {
+    add <- ggthemes::theme_clean() + 
+      ggplot2::theme(
+        plot.background = element_rect(colour = NA),
+        panel.background = element_rect(fill = "transparent", color = NA),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        legend.background = element_rect(color = NA),
+        panel.grid.major.x = element_line(linetype = 3, color = 'gray'),
+        panel.grid.major.y = element_blank()
+      )
+  }
+  return(add)
+}
 
