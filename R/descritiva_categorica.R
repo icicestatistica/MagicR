@@ -15,8 +15,10 @@
 #' @param cor string (opcional, padrão = "cyan4") Cor das barras ou das fatias do gráfico.
 #' @param ordenar lógico (opcional, padrão = TRUE) Se \code{TRUE}, as categorias serão ordenadas por
 #'  frequência. Caso contrário, elas são apresentadas na ordem original.
-#' @param virgula lógico (opcional, padrão = FALSE) Se \code{TRUE}, utiliza vírgula como separador decimal
-#'  nos rótulos dos gráficos (caso contrário, usa ponto).
+#' @param virgula lógico (opcional, padrão = FALSE) Se \code{TRUE}, utiliza vírgula como separador decimal nos rótulos dos gráficos (caso contrário, usa ponto).
+#' @param digitos numérico (opcional, padrão = `1`) número de casas decimais no percentual nos labels dos gráficos.
+#' @param forcarpizza lógico (opcional, padrão = FALSE) se devemos forçar um gráfico de pizza ou deia ele escolher (pizza para dois níveis e barras para mais de dois)
+#' @param orient opcional (padrão = "auto"). Se auto, opta por vertical ou horizontal a depender da quantidade de categorias e tamanho dos labels das categorias. Outras opções são "v" (gráfico vertical) e "h" (gráfico horizontal)
 #'
 #' @examples
 #' ## Mais de dois níveis, ordenando
@@ -32,110 +34,59 @@
 #' variavel = factor(c("Masculino", "Feminino", "Masculino"))
 #' grafico_categorica(var = variavel, nome = "Gênero")
 #'
-#' @import ggthemes forcats
+#' @import ggthemes forcats grDevices
 #' @export
-grafico_categorica <- function(var,nome, niveis='auto', cor='cyan4', ordenar=T,virgula=F){
+grafico_categorica <- function(var,nome, niveis='auto', cor='cyan4', ordenar=T,virgula=F,digitos=1,forcarpizza=F,orient="auto"){
   var = unlist(var)
   if (niveis[1]=='auto') niveis = names(table(var))
   var = factor(var, levels=niveis)
-  niveisnovo=vetor_comsep_c(niveis,11)
+  escolhaori = ifelse(orient=="v","v",ifelse(orient=="h","h",ifelse(orient=="auto",ifelse(length(niveis)>7 | max(sapply(niveis,nchar))>25,"h","v"))))
+  niveisnovo=magicR::vetor_comsep_c(niveis,ifelse(escolhaori=="v",11,25))
   levels(var)=niveisnovo
-  tab <- data.frame(table(var),perc=paste0(table(var),paste0(" (",100*round(prop.table(table(var)),3),"%)")),prop=paste0(table(var),paste0("\n  (",100*round(prop.table(table(var)),3),"%)")))
-  if(ordenar==T) {
-    if(length(niveis) > 2) {
-      result <- na.omit(tab) %>% mutate(var=forcats::fct_reorder(var, desc(Freq))) %>%
-        ggplot() + geom_bar(aes(x=var,y=Freq),fill=cor,stat="identity")  +
-        ylim(0,max(table(var))*1.1)+ ggthemes::theme_clean()  + ylab("") + xlab("") + ggtitle(paste0(vetor_comsep_c(nome,50)," (n=",length(na.omit(var)),")",collapse=""))+            geom_text(aes(x=var,y=Freq),label=ponto_para_virgula(tab$perc,virgula),vjust=-0.5) +
-        theme(
-          plot.background = element_rect(colour="white"),
-          axis.text.x=element_text(size=12),
-          plot.title = element_text(hjust = 0.5),
-          panel.grid.major = element_blank(), panel.grid.minor = element_blank())} else
-          {result = ggplot(tab, aes(x="",y=Freq,fill=var)) +
-            geom_bar(stat="identity", width=1) +
-            coord_polar("y", start=0) + theme_void(base_size=12) +
-            labs(fill="",title=paste0(vetor_comsep_c(nome,50)," (n=",length(na.omit(var)),")")) +
-            theme(plot.title = element_text(hjust = 0.5, size = ceiling(12 * 1.1), face = "bold"),
-                  plot.subtitle = element_text(size = ceiling(12 * 1.05)),
-                  plot.background = element_rect(colour="white")) +
-            geom_text(aes(label = ponto_para_virgula(prop,virgula)), color = "white", position = position_stack(vjust = 0.5)) +
-            scale_fill_manual(labels = vetor_comsep_c(niveis,11),values=lighten(cor,seq(0,0.3,(0.3/(length(tab$var)-1)))))}}
-  if(ordenar==F) {
-    result <- ggplot(tab) + geom_bar(aes(x=var,y=Freq),fill=cor,stat="identity")  + ylim(0,max(table(var))*1.1)+theme_clean()  + ylab("") + xlab("") +
-      ggtitle(paste0(vetor_comsep_c(nome,50)," (n=",length(na.omit(var)),")",collapse=""))+ geom_text(aes(x=var,y=Freq),label=ponto_para_virgula(tab$perc,virgula),vjust=-0.5) +
-      theme(
-        plot.background = element_rect(colour="white"),
-        axis.text.x=element_text(size=12),
-        plot.title = element_text(hjust = 0.5),
-        panel.grid.major = element_blank(), panel.grid.minor = element_blank())}
+  tab <- data.frame(table(var),perc=paste0(table(var),paste0(" (",round(100*prop.table(table(var)),digitos),"%)")),prop=paste0(table(var),paste0("\n  (",100*round(prop.table(table(var)),3),"%)")))
+  if(ordenar==T) {if(escolhaori=="v") ord = -tab$Freq else ord=tab$Freq
+  tab = na.omit(tab) %>%
+    mutate(var=forcats::fct_reorder(var, ord))
+  cores = grDevices::colorRampPalette(na.omit(cor[order(ord)]))(length(niveis))
+  niveisnovo = niveisnovo[order(ord)]} else
+  {cores = grDevices::colorRampPalette(cor)(length(niveis))}
+  ### gráficos de barras
+  if(length(niveis) > 2 & forcarpizza==F) {
+    if(escolhaori=="v"){
+      ### vertical
+      result <- ggplot(tab) +
+        geom_bar(aes(x=var,y=Freq,fill=var),stat="identity")  +
+        labs(x=NULL) +
+        scale_y_continuous(name=NULL, limits=c(0,max(table(var))*1.1),expand=c(0.025,0)) +
+        ggtitle(paste0(vetor_comsep_c(nome,50)," (n=",length(na.omit(var)),")",collapse=""))+
+        geom_text(aes(x=var,y=Freq),label=ponto_para_virgula(tab$perc,virgula),vjust=-0.5) +
+        scale_fill_manual(values=cores) +
+        magicR::theme_icic("h") +
+        theme(legend.position = "none")} else
+          ### horizontal
+        {sobra = max(tab$Freq)*0.05
+        result = ggplot(tab) +
+          geom_bar(aes(y=var,x=Freq,fill=var),stat="identity")  +
+          magicR::theme_icic("v")  +
+          labs(y=NULL) +
+          scale_x_continuous(expand=c(0.025,0),limits=c(0,max(table(var))*1.1),name=NULL) +
+          ggtitle(paste0(vetor_comsep_c(nome,50)," (n=",length(na.omit(var)),")",collapse=""))+
+          geom_text(aes(y=var,x=Freq+sobra),label=ponto_para_virgula(tab$prop,virgula),lineheight = 0.9) +
+          scale_fill_manual(values=cores) +
+          theme(legend.position = "none")}
+  } else
+    ### Gráfico de pizza
+  {if(length(cor)==1) cores = grDevices::colorRampPalette(c(cor,"white"))(length(niveis)+1)[-(length(niveis)+1)]
+  result = ggplot(tab, aes(x="",y=Freq,fill=var)) +
+    geom_bar(stat="identity", width=1) +
+    coord_polar("y", start=0) + theme_void(base_size=12) +
+    labs(fill="",title=paste0(vetor_comsep_c(nome,50)," (n=",length(na.omit(var)),")")) +
+    theme(plot.title = element_text(hjust = 0.5, size = ceiling(12 * 1.1), face = "bold"),
+          plot.subtitle = element_text(size = ceiling(12 * 1.05)),
+          plot.background = element_rect(colour="white")) +
+    geom_text(aes(label = ponto_para_virgula(prop,virgula)), color = "white", position = position_stack(vjust = 0.5)) +
+    scale_fill_manual(labels = niveisnovo,values=cores)}
   return(result)}
-
-#' Gera gráfico de barras horizontal para variáveis categóricas
-#'
-#' Esta função gera um gráfico de barras horizontal para variáveis categóricas,
-#' apresentando a frequência relativa de cada nível da variável. O gráfico permite
-#' personalização da cor, ordenação das categorias e definição dos níveis. Os rótulos
-#' de cada barra exibem a frequência absoluta e o percentual correspondente.
-#'
-#' @param var vetor (obrigatório) A variável categórica que será analisada.
-#' @param nome string (obrigatório) O nome da variável, que será exibido no título do gráfico.
-#' @param niveis vetor de strings (opcional, padrão = "auto") Os níveis da variável categórica.
-#'  Se definido como "auto", os níveis serão automaticamente extraídos da variável.
-#' @param cor string (opcional, padrão = "cyan4") Cor das barras no gráfico.
-#' @param ordenar lógico (opcional, padrão = TRUE) Se \code{TRUE}, as categorias serão ordenadas
-#'  por frequência. Caso contrário, serão apresentadas na ordem definida pelo parâmetro \code{niveis}.
-#' @param virgula lógico (opcional, padrão = FALSE) Se \code{TRUE}, utiliza vírgula como separador
-#'  decimal nos rótulos do gráfico (caso contrário, usa ponto).
-#'
-#' @details
-#' Esta função utiliza o pacote \code{ggplot2} para gerar um gráfico de barras horizontal,
-#' ideal para visualizar a distribuição de categorias de forma proporcional. A frequência
-#' absoluta (\code{Freq}) e relativa (\code{Freq_rel}) são calculadas internamente e usadas
-#' para compor o gráfico e os rótulos.
-#'
-#' @return
-#' Um objeto \code{ggplot} contendo o gráfico de barras horizontal.
-#'
-#' @examples
-#' ## Variável categórica com mais de dois níveis, ordenando
-#' variavel = factor(c("A", "B", "C", "A", "A", "B", "C"))
-#' grafico_categorica_vert(var = variavel, nome = "Categorias", ordenar = TRUE)
-#'
-#' ## Variável categórica com ordem definida
-#' variavel = factor(c("Idade: 0-10", "Idade: 11-20", "Idade: 11-20", "Idade: 21-30"))
-#' niveis_definidos = c("Idade: 0-10", "Idade: 11-20", "Idade: 21-30")
-#' grafico_categorica_vert(var = variavel, nome = "Faixa Etária", niveis = niveis_definidos, ordenar = FALSE)
-#'
-#' @export
-grafico_categorica_vert = function (var, nome, niveis = "auto", cor = "cyan4", ordenar = T,
-                                    virgula = F)
-{
-  require(ggplot2)
-  require(dplyr)
-  var = unlist(var)
-  if (niveis[1] == "auto") niveis = names(table(var))
-  df = table(var) %>% data.frame()
-  df$Freq_rel = prop.table(table(var)) %>%
-    data.frame() %>%
-    select("Freq") %>%
-    unlist()
-  df$var = vetor_comsep_c(df$var, 25)
-  if (ordenar == T) {
-    df = df %>%
-      arrange(desc(-Freq)) %>%
-      mutate(var = factor(var, levels = unique(var)))} else {
-        df = df %>% mutate(var = factor(var, levels = vetor_comsep_c(niveis,25)))}
-  plot = df %>%
-    ggplot(aes(y = var, x = Freq_rel)) +
-    geom_bar(stat = "identity",fill = cor) +
-    magicR::theme_icic("v") +
-    geom_text(aes(label = ponto_para_virgula(paste0(Freq," (",100 *round(Freq_rel, 2), "%)"), virgula),x=Freq_rel+max(Freq_rel)/10)) +
-    scale_x_continuous(labels = scales::percent_format(),
-                       expand = expansion(mult = c(0, 0.05)), limits=c(0,max(df$Freq_rel)+0.13)) +
-    labs(y = NULL,x = "Proporção",
-         title = vetor_comsep_c(paste(nome," (n=", length(na.omit(var)), ")", sep = ""), 50))
-  return(plot)
-}
 
 #' quiqua_aderencia
 #'
@@ -250,8 +201,8 @@ quiqua_aderencia <- function(vetor,nomecat,niveis='auto',ordenar=T,dig=2){
 #' @param teste Lógico. Se `TRUE`, executa o teste qui-quadrado de aderência na variável categórica. Padrão: `FALSE`.
 #' @param grafico Lógico. Se `TRUE`, gera um gráfico de barras para a variável categórica. Padrão: `TRUE`.
 #' @param cor Cor a ser utilizada no gráfico de barras. Padrão: `"cyan4"`.
-#' @param digitos Número de casas decimais para arredondamento. Padrão: `2`.
-#' @param virgula Lógico. Se `TRUE`, utiliza vírgula como separador decimal. Padrão: `FALSE`.
+#' @param digitos Número de casas decimais para arredondamento na tabela. Padrão: `2`.
+#' @param virgula Lógico. Se `TRUE`, utiliza vírgula como separador decimal no gráfico. Padrão: `FALSE`.
 #'
 #' @details
 #' A função produz:
@@ -268,7 +219,7 @@ quiqua_aderencia <- function(vetor,nomecat,niveis='auto',ordenar=T,dig=2){
 #' \item{texto}{Texto interpretativo sobre os grupos da variável categórica.}
 #' \item{interp}{Interpretação textual resumida sobre a variável}
 #' \item{tabela}{Resultado do teste qui-quadrado, se aplicável.}
-#' \item{grafico}{Objeto gráfico (ggplot2) com o gráfico de barras.}
+#' \item{grafico}{Objeto gráfico (ggplot2) com o gráfico de barras ou pizza}
 #'
 #' @examples
 #' # Criando um vetor categórico de exemplo
@@ -295,31 +246,28 @@ desc_uni_categorica <- function(variavel, nome, niveis = 'auto', nas = FALSE, la
 
   tablevar <- table(variavel)
   if (ordenar) tablevar <- table(factor(variavel, levels = names(tablevar)[order(tablevar, decreasing = TRUE)]))
-  prop <- 100 * round(prop.table(tablevar), 3)
+  prop <- paste0(magicR::ponto_para_virgula(round(100*prop.table(tablevar), digitos),virgula),"%")
 
-  res <- c()
-  for (i in 1:(length(tablevar) - 1))
-    res <- c(res, paste(names(tablevar)[i], " (", prop[i], "%)", sep = ""))
-  descri <- paste(paste(res, collapse = ", "), " e ",
-                  paste(names(tablevar)[length(tablevar)], " (", prop[length(tablevar)], "%).", sep = ""))
+  descri = magicR::printvetor(paste0(names(tablevar), " (", prop, ")"),aspas = F)
 
-  interpretacao <- paste(" + Em relação à variável **'", nome, "'**, tivemos os grupos ", descri, sep = "")
-  interp_resumo <- paste(nome, " se dividiu nos grupos ", descri, sep = "")
+  if (length(tablevar)==1) {
+    interpretacao = paste0("Todas as observações pertencem à categoria ",descri,".")
+    interp_resumo = paste0(nome, " foi exclusivamente ", descri,".")} else {
+      interpretacao <- paste0(" + Em relação à **'", nome, "'**, tivemos os grupos ", descri)
+      interp_resumo <- paste0(nome, " se dividiu nos grupos ", descri)
+    }
 
-  if (!nas) {
-    d <- data.frame(t(rbind(round(tablevar, 0), paste0(round(100 * prop.table(tablevar), digitos), "%"))))
-  } else {
-    d <- t(rbind(round(tablevar, 0), paste0(round(100 * tablevar / length(variavel), digitos), "%")))
-    d <- rbind(d, "N/A" = c(sum(is.na(variavel)), paste0(round(100 * sum(is.na(variavel)) / length(variavel), digitos), "%")))
-  }
+  d <- data.frame(tablevar, prop)
+  d$Var1 = as.character(d$Var1)
 
-  if (ordenar) d <- d[order(as.numeric(d[, 1]), decreasing = TRUE), ]
-  if (label) d <- data.frame(d, "Freq." = paste0(d[, 1], " (", d[, 2], ")"))
+  if (nas==T) {
+    d <- rbind(d, c("N/A",sum(is.na(variavel)), paste0(round(100 * sum(is.na(variavel)) / length(variavel), digitos), "%")))}
+
+  if (label) d <- data.frame(d, "Freq." = paste0(d[,2], " (", d[, 3], ")"))
   if (acumula)
-    d <- data.frame(d, "Freq. Relativa Acumulada" = paste0(cumsum(d[, 1]), " (",
-                                                           round(100 * cumsum(d[, 1]) / (cumsum(d[, 1])[nrow(d)]), digitos), "%)"))
+    d <- data.frame(d, "Freq. Relativa Acumulada" = paste0(cumsum(d[, 2]), " (",
+                                                          magicR::ponto_para_virgula(round(100 * cumsum(d[, 2]) / (cumsum(d[, 2])[nrow(d)]), digitos),virgula), "%)"))
 
-  d <- data.frame(row.names(d), d)
   colnames(d) <- c("Característica", "Frequência", "Freq. Relativa", "Freq.", "Freq. Acumulada")[c(TRUE, TRUE, TRUE, label, acumula)]
   row.names(d) <- NULL
 
@@ -338,10 +286,7 @@ desc_uni_categorica <- function(variavel, nome, niveis = 'auto', nas = FALSE, la
   }
 
   if (grafico) {
-    if (sum(nchar(niveis)) < 80)
-      graficoc <- magicR::grafico_categorica(variavel, nome, niveis, cor, ordenar, virgula)
-    else
-      graficoc <- magicR::grafico_categorica_vert(variavel, nome, niveis, cor, ordenar, virgula)
+      graficoc <- magicR::grafico_categorica(variavel, nome, niveis, cor, ordenar, virgula,digitos)
   } else {
     graficoc <- NULL
   }
