@@ -16,7 +16,9 @@ desc_uni_categorica(
   grafico = TRUE,
   cor = "cyan4",
   digitos = 2,
-  virgula = FALSE
+  virgula = FALSE,
+  forcarpizza = F,
+  orient = "auto"
 )
 }
 \arguments{
@@ -43,6 +45,10 @@ desc_uni_categorica(
 \item{digitos}{Número de casas decimais para arredondamento. Padrão: `2`.}
 
 \item{virgula}{Lógico. Se `TRUE`, utiliza vírgula como separador decimal. Padrão: `FALSE`.}
+
+\item{forcarpizza}{lógico (opcional, padrão = FALSE) se devemos forçar um gráfico de pizza ou deixa ele escolher (pizza para dois níveis e barras para mais de dois)}
+
+\item{orient}{opcional (padrão = "auto"). Se auto, opta por vertical se a quantidade de categorias for menor que 7 e o tamanho dos labels de todas categorias for menor que 25 e horizontal caso contrário. Outras opções são "v" (gráfico vertical) e "h" (gráfico horizontal)}
 }
 \value{
 Um objeto `list` contendo os seguintes elementos:

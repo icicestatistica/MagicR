@@ -221,6 +221,8 @@ quiqua_aderencia <- function(vetor,
 #' @param cor Cor a ser utilizada no gráfico de barras. Padrão: `"cyan4"`. Pode ser um vetor de cores também.
 #' @param digitos Número de casas decimais para arredondamento. Padrão: `2`.
 #' @param virgula Lógico. Se `TRUE`, utiliza vírgula como separador decimal. Padrão: `FALSE`.
+#' @param forcarpizza lógico (opcional, padrão = FALSE) se devemos forçar um gráfico de pizza ou deixa ele escolher (pizza para dois níveis e barras para mais de dois)
+#' @param orient opcional (padrão = "auto"). Se auto, opta por vertical se a quantidade de categorias for menor que 7 e o tamanho dos labels de todas categorias for menor que 25 e horizontal caso contrário. Outras opções são "v" (gráfico vertical) e "h" (gráfico horizontal)
 #'
 #' @details
 #' A função produz:
@@ -266,7 +268,9 @@ desc_uni_categorica <- function(variavel,
                                 grafico = TRUE,
                                 cor = "cyan4",
                                 digitos = 2,
-                                virgula = FALSE) {
+                                virgula = FALSE,
+                                forcarpizza=F,
+                                orient="auto") {
   variavel <- unlist(variavel)
   if (niveis[1] == 'auto') niveis <- names(table(variavel))
   var_ini = factor(variavel,niveis); niv_ini = niveis
@@ -311,7 +315,7 @@ desc_uni_categorica <- function(variavel,
   }
 
   if (grafico) {
-      graficoc <- magicR::grafico_categorica(variavel, nome, niveis, cor, ordenar, virgula,digitos)
+      graficoc <- magicR::grafico_categorica(variavel, nome, niveis, cor, ordenar, virgula,digitos,forcarpizza,orient)
   } else {
     graficoc <- NULL
   }
