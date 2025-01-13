@@ -40,9 +40,9 @@ desc_uni_categorica(
 
 \item{cor}{Cor a ser utilizada no gráfico de barras. Padrão: `"cyan4"`.}
 
-\item{digitos}{Número de casas decimais para arredondamento. Padrão: `2`.}
+\item{digitos}{Número de casas decimais para arredondamento na tabela. Padrão: `2`.}
 
-\item{virgula}{Lógico. Se `TRUE`, utiliza vírgula como separador decimal. Padrão: `FALSE`.}
+\item{virgula}{Lógico. Se `TRUE`, utiliza vírgula como separador decimal no gráfico. Padrão: `FALSE`.}
 }
 \value{
 Um objeto `list` contendo os seguintes elementos:
@@ -51,7 +51,7 @@ Um objeto `list` contendo os seguintes elementos:
 \item{texto}{Texto interpretativo sobre os grupos da variável categórica.}
 \item{interp}{Interpretação textual resumida sobre a variável}
 \item{tabela}{Resultado do teste qui-quadrado, se aplicável.}
-\item{grafico}{Objeto gráfico (ggplot2) com o gráfico de barras.}
+\item{grafico}{Objeto gráfico (ggplot2) com o gráfico de barras ou pizza}
 }
 \description{
 Esta função realiza uma análise descritiva univariada para variáveis categóricas, incluindo tabelas de frequência,

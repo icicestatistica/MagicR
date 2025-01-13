@@ -3,10 +3,7 @@
 #' Esta função gera um gráfico de barras ou gráfico de pizza para variáveis categóricas,
 #' com a possibilidade de personalizar a cor das barras e a ordem das categorias.
 #' O gráfico exibe a frequência de cada nível da variável, bem como o percentual
-#' correspondente a cada categoria. A escolha do tipo de gráfico é feita automaticamente:
-#' se a variável tiver mais de 2 níveis ou o parâmetro \code{ordenar} estiver configurado
-#' como \code{TRUE}, o gráfico será de barras; caso contrário (apenas 2 níveis, sem ordenamento),
-#' será gerado um gráfico de pizza.
+#' correspondente a cada categoria.
 #'
 #' @param var vetor (obrigatório) A variável categórica que será analisada.
 #' @param nome string (obrigatório) O nome da variável, que será exibido nos títulos dos gráficos.
@@ -17,8 +14,8 @@
 #'  frequência. Caso contrário, elas são apresentadas na ordem original.
 #' @param virgula lógico (opcional, padrão = FALSE) Se \code{TRUE}, utiliza vírgula como separador decimal nos rótulos dos gráficos (caso contrário, usa ponto).
 #' @param digitos numérico (opcional, padrão = `1`) número de casas decimais no percentual nos labels dos gráficos.
-#' @param forcarpizza lógico (opcional, padrão = FALSE) se devemos forçar um gráfico de pizza ou deia ele escolher (pizza para dois níveis e barras para mais de dois)
-#' @param orient opcional (padrão = "auto"). Se auto, opta por vertical ou horizontal a depender da quantidade de categorias e tamanho dos labels das categorias. Outras opções são "v" (gráfico vertical) e "h" (gráfico horizontal)
+#' @param forcarpizza lógico (opcional, padrão = FALSE) se devemos forçar um gráfico de pizza ou deixa ele escolher (pizza para dois níveis e barras para mais de dois)
+#' @param orient opcional (padrão = "auto"). Se auto, opta por vertical se a quantidade de categorias for menor que 7 e o tamanho dos labels de todas categorias for menor que 25 e horizontal caso contrário. Outras opções são "v" (gráfico vertical) e "h" (gráfico horizontal)
 #'
 #' @examples
 #' ## Mais de dois níveis, ordenando
