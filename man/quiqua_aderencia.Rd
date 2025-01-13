@@ -4,7 +4,14 @@
 \alias{quiqua_aderencia}
 \title{quiqua_aderencia}
 \usage{
-quiqua_aderencia(vetor, nomecat, niveis = "auto", ordenar = T, dig = 2)
+quiqua_aderencia(
+  vetor,
+  nomecat,
+  niveis = "auto",
+  ordenar = T,
+  dig = 2,
+  virgula = F
+)
 }
 \arguments{
 \item{vetor}{Vetor ou lista contendo a variável categórica a ser analisada.}
@@ -16,6 +23,8 @@ quiqua_aderencia(vetor, nomecat, niveis = "auto", ordenar = T, dig = 2)
 \item{ordenar}{Lógico. Se `TRUE`, os resultados são ordenados por resíduos padronizados. Padrão: `TRUE`.}
 
 \item{dig}{Número de casas decimais para arredondamento. Padrão: `2`.}
+
+\item{virgula}{Lógico. Se `TRUE`, utiliza vírgula como separador decimal. Padrão: `FALSE`.}
 }
 \value{
 Um objeto `list` com os seguintes elementos:

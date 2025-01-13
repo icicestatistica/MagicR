@@ -16,6 +16,7 @@
 #' @param digitos numérico (opcional, padrão = `1`) número de casas decimais no percentual nos labels dos gráficos.
 #' @param forcarpizza lógico (opcional, padrão = FALSE) se devemos forçar um gráfico de pizza ou deixa ele escolher (pizza para dois níveis e barras para mais de dois)
 #' @param orient opcional (padrão = "auto"). Se auto, opta por vertical se a quantidade de categorias for menor que 7 e o tamanho dos labels de todas categorias for menor que 25 e horizontal caso contrário. Outras opções são "v" (gráfico vertical) e "h" (gráfico horizontal)
+#' @param nas Lógico. Se `TRUE`, inclui as frequências de valores ausentes (NA) no gráfico. Padrão: `FALSE`
 #'
 #' @examples
 #' ## Mais de dois níveis, ordenando
@@ -33,16 +34,27 @@
 #'
 #' @import ggthemes forcats grDevices
 #' @export
-grafico_categorica <- function(var,nome, niveis='auto', cor='cyan4', ordenar=T,virgula=F,digitos=1,forcarpizza=F,orient="auto"){
+grafico_categorica <- function(var,
+                               nome,
+                               niveis='auto',
+                               cor='cyan4',
+                               ordenar=T,
+                               virgula=F,
+                               digitos=1,
+                               forcarpizza=F,
+                               orient="auto",
+                               nas=F){
   var = unlist(var)
   if (niveis[1]=='auto') niveis = names(table(var))
+  if(nas) {var[is.na(var)]="N/A"; niveis = c(niveis,"N/A")}
   var = factor(var, levels=niveis)
   escolhaori = ifelse(orient=="v","v",ifelse(orient=="h","h",ifelse(orient=="auto",ifelse(length(niveis)>7 | max(sapply(niveis,nchar))>25,"h","v"))))
   niveisnovo=magicR::vetor_comsep_c(niveis,ifelse(escolhaori=="v",11,25))
   levels(var)=niveisnovo
   tab <- data.frame(table(var),perc=paste0(table(var),paste0(" (",round(100*prop.table(table(var)),digitos),"%)")),prop=paste0(table(var),paste0("\n  (",100*round(prop.table(table(var)),3),"%)")))
-  if(ordenar==T) {if(escolhaori=="v") ord = -tab$Freq else ord=tab$Freq
-  tab = na.omit(tab) %>%
+  if(ordenar==T) {
+    if(escolhaori=="v") ord = -tab$Freq else ord=tab$Freq
+    tab = na.omit(tab) %>%
     mutate(var=forcats::fct_reorder(var, ord))
   cores = grDevices::colorRampPalette(na.omit(cor[order(ord)]))(length(niveis))
   niveisnovo = niveisnovo[order(ord)]} else
@@ -65,8 +77,8 @@ grafico_categorica <- function(var,nome, niveis='auto', cor='cyan4', ordenar=T,v
         result = ggplot(tab) +
           geom_bar(aes(y=var,x=Freq,fill=var),stat="identity")  +
           magicR::theme_icic("v")  +
-          labs(y=NULL) +
-          scale_x_continuous(expand=c(0.025,0),limits=c(0,max(table(var))*1.1),name=NULL) +
+          labs(y=NULL,x="Frequência") +
+          scale_x_continuous(expand=c(0.025,0),limits=c(0,max(table(var))*1.1)) +
           ggtitle(paste0(vetor_comsep_c(nome,50)," (n=",length(na.omit(var)),")",collapse=""))+
           geom_text(aes(y=var,x=Freq+sobra),label=ponto_para_virgula(tab$prop,virgula),lineheight = 0.9) +
           scale_fill_manual(values=cores) +
@@ -94,6 +106,7 @@ grafico_categorica <- function(var,nome, niveis='auto', cor='cyan4', ordenar=T,v
 #' @param niveis Ordem dos níveis da variável categórica. Padrão é `"auto"`, que utiliza os níveis da variável.
 #' @param ordenar Lógico. Se `TRUE`, os resultados são ordenados por resíduos padronizados. Padrão: `TRUE`.
 #' @param dig Número de casas decimais para arredondamento. Padrão: `2`.
+#' @param virgula Lógico. Se `TRUE`, utiliza vírgula como separador decimal. Padrão: `FALSE`.
 #'
 #' @return Um objeto `list` com os seguintes elementos:
 #' \item{texto}{Texto interpretativo do teste qui-quadrado e dos resíduos.}
@@ -117,7 +130,12 @@ grafico_categorica <- function(var,nome, niveis='auto', cor='cyan4', ordenar=T,v
 #'
 #' @import stringr rstatix knitr
 #' @export
-quiqua_aderencia <- function(vetor,nomecat,niveis='auto',ordenar=T,dig=2){
+quiqua_aderencia <- function(vetor,
+                             nomecat,
+                             niveis='auto',
+                             ordenar=T,
+                             dig=2,
+                             virgula=F){
   vetor = unlist(vetor)
   if(niveis[1]=='auto') niveis = names(table(vetor))
   vetor <- factor(vetor,levels=niveis)
@@ -131,7 +149,7 @@ quiqua_aderencia <- function(vetor,nomecat,niveis='auto',ordenar=T,dig=2){
     quiqua <- chisq.test(tabela)
 
     ic <- c()
-    for (i in 1:length(tabela)) {ic <- rbind(ic,paste("(",paste(round(100*prop.test(x=as.vector(tabela)[i],n=length(vetor),p=1/length(tabela))$conf.int[1:2],2),collapse="%, "),"%)",sep=""))}
+    for (i in 1:length(tabela)) {ic <- rbind(ic,magicR::ponto_para_virgula(paste("(",paste(round(100*prop.test(x=as.vector(tabela)[i],n=length(vetor),p=1/length(tabela))$conf.int[1:2],dig),collapse="%, "),"%)",sep=""),virgula))}
 
     ef=round(rstatix::cramer_v(tabela, p = rep(1/length(tabela),length(tabela))),dig)
 
@@ -154,7 +172,7 @@ quiqua_aderencia <- function(vetor,nomecat,niveis='auto',ordenar=T,dig=2){
       texto = paste0(" * **",nomecat,":** Através do teste qui-quadrado de aderência, rejeitamos a hipótese de igualdade entre todas as frequências (",paste("$\\chi^2$",collapse=NULL),"(",quiqua$parameter,") = ", round(quiqua$statistic,dig),", p=", magicR::pvalor(quiqua$p.value),", V de Cramer=",ef,"). Isso significa que pelo menos uma frequência difere de 1/",length(tabela)," = **",round(100*1/length(tabela),dig),"%**.  O efeito foi medido pela estatística V de Cramer (",ef,"), que ",efeito, " Passamos a analisar os resíduos do teste qui-quadrado para encontrar quais frequências não são compatíveis com a frequência esperada (",round(100*1/length(tabela),dig),"%). Tomando como base uma significância de 5%, como temos ",length(tabela)," categorias, o ponto de corte $\\alpha$ utilizado será 0.05/",length(tabela),"=",round(0.05/length(tabela),4),", resultando num valor crítico (bilateral) de ",abs(round(qnorm((0.05/length(tabela))/2),dig)),". Portanto, resíduos padronizados ajustados fora da região (",round(qnorm((0.05/length(tabela))/2),dig),",",-round(qnorm((0.05/length(tabela))/2),dig),") serão considerados estatisticamente significativos. Complementando a análise, calculamos o p-valor de cada resíduo. Lembrando que agora, utilizaremos o novo $\\alpha$ (",round(0.05/length(tabela),4),"), ou seja, o resíduo será considerado estatisticamente significativo se o p-valor for menor do que esse valor.")
 
     if (quiqua$p.value<0.05){
-      a=data.frame(names(tabela),paste0(round(100*prop.table(tabela),dig),"%"),"IC 95%"=ic,"`Resíduos padronizados ajustados`"=round(quiqua$stdres,dig),
+      a=data.frame(names(tabela),magicR::ponto_para_virgula(paste0(round(100*prop.table(tabela),dig),"%"),virgula),"IC 95%"=ic,"`Resíduos padronizados ajustados`"=round(quiqua$stdres,dig),
                    "p-valor"=round(2*(1-pnorm(abs(quiqua$stdres))),3))[,-c(4,6)]
       names(a)=c("Categoria","Frequência observada","IC 95%","Resíduos padronizados","p-valor")
       if(ordenar==T) a=a[order(a$`Resíduos padronizados`,decreasing=T),]
@@ -168,6 +186,9 @@ quiqua_aderencia <- function(vetor,nomecat,niveis='auto',ordenar=T,dig=2){
       for (i in 1:(dim(a)[1])) {if(stringr::str_sub(a$`p-valor`[i],-1)=="*" & a$`Resíduos padronizados`[i]>0) maior <- c(maior,a$Categoria[i]) else
         if(stringr::str_sub(a$`p-valor`[i],-1)=="*" & a$`Resíduos padronizados`[i]<0) menor <- c(menor,a$Categoria[i]) else nula <- c(nula,a$Categoria[i])
       }
+
+      a$`Resíduos padronizados` = magicR::ponto_para_virgula(a$`Resíduos padronizados`,virgula)
+      a$`p-valor` = magicR::ponto_para_virgula(a$`p-valor`,virgula)
 
       texto2=c(texto2," Através da análise de resíduos, concluimos que: \n")
       if(length(maior)==1) texto2 <- c(texto2,c("  + A categoria ",magicR::printvetor(maior)," possui frequência **maior** do que era esperado sob hipótese de igualdade de proporções. \n"))
@@ -191,15 +212,15 @@ quiqua_aderencia <- function(vetor,nomecat,niveis='auto',ordenar=T,dig=2){
 #' @param variavel Vetor ou lista contendo a variável categórica a ser analisada.
 #' @param nome Nome da variável categórica para uso nos textos descritivos.
 #' @param niveis Ordem dos níveis da variável categórica. Padrão é `"auto"`, que utiliza os níveis detectados na variável.
-#' @param nas Lógico. Se `TRUE`, inclui as frequências de valores ausentes (NA) na tabela. Padrão: `FALSE`.
+#' @param nas Lógico. Se `TRUE`, inclui as frequências de valores ausentes (NA) nas informações. Padrão: `FALSE`.
 #' @param label Lógico. Se `TRUE`, adiciona uma coluna com frequência absoluta e relativa concatenadas. Padrão: `FALSE`.
 #' @param ordenar Lógico. Se `TRUE`, ordena os resultados em ordem decrescente de frequência. Padrão: `TRUE`.
 #' @param acumula Lógico. Se `TRUE`, adiciona uma coluna com frequência acumulada. Padrão: `TRUE`.
 #' @param teste Lógico. Se `TRUE`, executa o teste qui-quadrado de aderência na variável categórica. Padrão: `FALSE`.
 #' @param grafico Lógico. Se `TRUE`, gera um gráfico de barras para a variável categórica. Padrão: `TRUE`.
-#' @param cor Cor a ser utilizada no gráfico de barras. Padrão: `"cyan4"`.
-#' @param digitos Número de casas decimais para arredondamento na tabela. Padrão: `2`.
-#' @param virgula Lógico. Se `TRUE`, utiliza vírgula como separador decimal no gráfico. Padrão: `FALSE`.
+#' @param cor Cor a ser utilizada no gráfico de barras. Padrão: `"cyan4"`. Pode ser um vetor de cores também.
+#' @param digitos Número de casas decimais para arredondamento. Padrão: `2`.
+#' @param virgula Lógico. Se `TRUE`, utiliza vírgula como separador decimal. Padrão: `FALSE`.
 #'
 #' @details
 #' A função produz:
@@ -234,11 +255,22 @@ quiqua_aderencia <- function(vetor,nomecat,niveis='auto',ordenar=T,dig=2){
 #' relatorio(resultado)
 #'
 #' @export
-desc_uni_categorica <- function(variavel, nome, niveis = 'auto', nas = FALSE, label = FALSE,
-                                ordenar = TRUE, acumula = TRUE, teste = FALSE, grafico = TRUE,
-                                cor = "cyan4", digitos = 2, virgula = FALSE) {
+desc_uni_categorica <- function(variavel,
+                                nome,
+                                niveis = 'auto',
+                                nas = FALSE,
+                                label = FALSE,
+                                ordenar = TRUE,
+                                acumula = TRUE,
+                                teste = FALSE,
+                                grafico = TRUE,
+                                cor = "cyan4",
+                                digitos = 2,
+                                virgula = FALSE) {
   variavel <- unlist(variavel)
   if (niveis[1] == 'auto') niveis <- names(table(variavel))
+  var_ini = factor(variavel,niveis); niv_ini = niveis
+  if(nas) {variavel[is.na(variavel)]="N/A"; niveis = c(niveis,"N/A")}
   variavel <- factor(variavel, levels = niveis)
 
   tablevar <- table(variavel)
@@ -255,10 +287,6 @@ desc_uni_categorica <- function(variavel, nome, niveis = 'auto', nas = FALSE, la
     }
 
   d <- data.frame(tablevar, prop)
-  d$Var1 = as.character(d$Var1)
-
-  if (nas==T) {
-    d <- rbind(d, c("N/A",sum(is.na(variavel)), paste0(round(100 * sum(is.na(variavel)) / length(variavel), digitos), "%")))}
 
   if (label) d <- data.frame(d, "Freq." = paste0(d[,2], " (", d[, 3], ")"))
   if (acumula)
@@ -272,7 +300,7 @@ desc_uni_categorica <- function(variavel, nome, niveis = 'auto', nas = FALSE, la
     testectexto <- NULL
     testectabela <- NULL
   } else {
-    testec <- magicR::quiqua_aderencia(variavel, nome, niveis, ordenar, digitos)
+    testec <- magicR::quiqua_aderencia(var_ini, nome, niv_ini, ordenar, digitos,virgula)
     if (length(testec) == 1) {
       testectexto <- testec$texto
       testectabela <- NULL

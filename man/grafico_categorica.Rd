@@ -13,7 +13,8 @@ grafico_categorica(
   virgula = F,
   digitos = 1,
   forcarpizza = F,
-  orient = "auto"
+  orient = "auto",
+  nas = F
 )
 }
 \arguments{
@@ -36,6 +37,8 @@ frequência. Caso contrário, elas são apresentadas na ordem original.}
 \item{forcarpizza}{lógico (opcional, padrão = FALSE) se devemos forçar um gráfico de pizza ou deixa ele escolher (pizza para dois níveis e barras para mais de dois)}
 
 \item{orient}{opcional (padrão = "auto"). Se auto, opta por vertical se a quantidade de categorias for menor que 7 e o tamanho dos labels de todas categorias for menor que 25 e horizontal caso contrário. Outras opções são "v" (gráfico vertical) e "h" (gráfico horizontal)}
+
+\item{nas}{Lógico. Se `TRUE`, inclui as frequências de valores ausentes (NA) no gráfico. Padrão: `FALSE`}
 }
 \description{
 Esta função gera um gráfico de barras ou gráfico de pizza para variáveis categóricas,

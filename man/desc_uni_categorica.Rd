@@ -26,7 +26,7 @@ desc_uni_categorica(
 
 \item{niveis}{Ordem dos níveis da variável categórica. Padrão é `"auto"`, que utiliza os níveis detectados na variável.}
 
-\item{nas}{Lógico. Se `TRUE`, inclui as frequências de valores ausentes (NA) na tabela. Padrão: `FALSE`.}
+\item{nas}{Lógico. Se `TRUE`, inclui as frequências de valores ausentes (NA) nas informações. Padrão: `FALSE`.}
 
 \item{label}{Lógico. Se `TRUE`, adiciona uma coluna com frequência absoluta e relativa concatenadas. Padrão: `FALSE`.}
 
@@ -38,11 +38,11 @@ desc_uni_categorica(
 
 \item{grafico}{Lógico. Se `TRUE`, gera um gráfico de barras para a variável categórica. Padrão: `TRUE`.}
 
-\item{cor}{Cor a ser utilizada no gráfico de barras. Padrão: `"cyan4"`.}
+\item{cor}{Cor a ser utilizada no gráfico de barras. Padrão: `"cyan4"`. Pode ser um vetor de cores também.}
 
-\item{digitos}{Número de casas decimais para arredondamento na tabela. Padrão: `2`.}
+\item{digitos}{Número de casas decimais para arredondamento. Padrão: `2`.}
 
-\item{virgula}{Lógico. Se `TRUE`, utiliza vírgula como separador decimal no gráfico. Padrão: `FALSE`.}
+\item{virgula}{Lógico. Se `TRUE`, utiliza vírgula como separador decimal. Padrão: `FALSE`.}
 }
 \value{
 Um objeto `list` contendo os seguintes elementos:
