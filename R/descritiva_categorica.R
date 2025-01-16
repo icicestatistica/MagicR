@@ -67,11 +67,12 @@ grafico_categorica <- function(var,
         geom_bar(aes(x=var,y=Freq,fill=var),stat="identity")  +
         labs(x=NULL) +
         scale_y_continuous(name=NULL, limits=c(0,max(table(var))*1.1),expand=c(0.025,0)) +
-        ggtitle(paste0(vetor_comsep_c(nome,50)," (n=",length(na.omit(var)),")",collapse=""))+
-        geom_text(aes(x=var,y=Freq),label=ponto_para_virgula(tab$perc,virgula),vjust=-0.5) +
+        ggtitle(paste0(magicR::vetor_comsep_c(nome,50)," (n=",length(na.omit(var)),")",collapse=""))+
+        geom_text(aes(x=var,y=Freq),label=magicR::ponto_para_virgula(tab$perc,virgula),vjust=-0.5) +
         scale_fill_manual(values=cores) +
         magicR::theme_icic("h") +
-        theme(legend.position = "none")} else
+        theme(legend.position = "none",
+              axis.text = element_text(size=12))} else
           ### horizontal
         {sobra = max(tab$Freq)*0.05
         result = ggplot(tab) +
@@ -79,17 +80,18 @@ grafico_categorica <- function(var,
           magicR::theme_icic("v")  +
           labs(y=NULL,x="Frequência") +
           scale_x_continuous(expand=c(0.025,0),limits=c(0,max(table(var))*1.1)) +
-          ggtitle(paste0(vetor_comsep_c(nome,50)," (n=",length(na.omit(var)),")",collapse=""))+
+          ggtitle(paste0(magicR::vetor_comsep_c(nome,50)," (n=",length(na.omit(var)),")",collapse=""))+
           geom_text(aes(y=var,x=Freq+sobra),label=ponto_para_virgula(tab$prop,virgula),lineheight = 0.9) +
           scale_fill_manual(values=cores) +
-          theme(legend.position = "none")}
+          theme(legend.position = "none",
+                axis.text = element_text(size=12))}
   } else
     ### Gráfico de pizza
   {if(length(cor)==1) cores = grDevices::colorRampPalette(c(cor,"white"))(length(niveis)+1)[-(length(niveis)+1)]
   result = ggplot(tab, aes(x="",y=Freq,fill=var)) +
     geom_bar(stat="identity", width=1) +
     coord_polar("y", start=0) + theme_void(base_size=12) +
-    labs(fill="",title=paste0(vetor_comsep_c(nome,50)," (n=",length(na.omit(var)),")")) +
+    labs(fill="",title=paste0(magicR::vetor_comsep_c(nome,50)," (n=",length(na.omit(var)),")")) +
     theme(plot.title = element_text(hjust = 0.5, size = ceiling(12 * 1.1), face = "bold"),
           plot.subtitle = element_text(size = ceiling(12 * 1.05)),
           plot.background = element_rect(colour="white")) +
