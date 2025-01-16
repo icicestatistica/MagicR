@@ -81,7 +81,7 @@ grafico_categorica <- function(var,
           labs(y=NULL,x="Frequência") +
           scale_x_continuous(expand=c(0.025,0),limits=c(0,max(table(var))*1.1)) +
           ggtitle(paste0(magicR::vetor_comsep_c(nome,50)," (n=",length(na.omit(var)),")",collapse=""))+
-          geom_text(aes(y=var,x=Freq+sobra),label=ponto_para_virgula(tab$prop,virgula),lineheight = 0.9) +
+          geom_text(aes(y=var,x=Freq+sobra),label=magicR::ponto_para_virgula(tab$prop,virgula),lineheight = 0.9) +
           scale_fill_manual(values=cores) +
           theme(legend.position = "none",
                 axis.text = element_text(size=12))}

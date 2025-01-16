@@ -7,6 +7,7 @@
 graficos_continua(
   var,
   nome,
+  tipo = "ambos",
   bins = 20,
   cor = "cyan4",
   digitos = 2,
@@ -20,6 +21,8 @@ graficos_continua(
 \item{var}{Vetor numérico com os dados da variável contínua.}
 
 \item{nome}{Nome da variável (como string) para ser utilizado nos gráficos.}
+
+\item{tipo}{Quais gráficos serão plotados. Sendo o padrão "ambos" (ambos: Histograma e boxplot alinhados); "hist" histograma e "box" boxplot}
 
 \item{bins}{Número de bins para o histograma (padrão é 20).}
 

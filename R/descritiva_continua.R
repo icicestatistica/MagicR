@@ -96,6 +96,7 @@ desc_uni_continua <- function(vari,nome,bins=20,texto=T, grafico=T,cor='cyan4',d
 #'
 #' @param var Vetor numérico com os dados da variável contínua.
 #' @param nome Nome da variável (como string) para ser utilizado nos gráficos.
+#' @param tipo Quais gráficos serão plotados. Sendo o padrão "ambos" (ambos: Histograma e boxplot alinhados); "hist" histograma e "box" boxplot
 #' @param bins Número de bins para o histograma (padrão é 20).
 #' @param cor Cor a ser usada nos gráficos (padrão é 'cyan4').
 #' @param digitos Número de dígitos para arredondamento nas estatísticas (padrão é 2).
@@ -115,7 +116,7 @@ desc_uni_continua <- function(vari,nome,bins=20,texto=T, grafico=T,cor='cyan4',d
 #' @export
 #'
 
-graficos_continua = function (var, nome, bins = 20, cor = "cyan4", digitos = 2, idioma = "PT",
+graficos_continua = function (var, nome, tipo="ambos",bins = 20, cor = "cyan4", digitos = 2, idioma = "PT",
                               virgula = F,xmin='auto',xmax='auto')
 {
   d <- data.frame(var = as.numeric(unlist(var)))
@@ -127,7 +128,7 @@ graficos_continua = function (var, nome, bins = 20, cor = "cyan4", digitos = 2, 
   media = mean(d$var, na.rm = T)
   if (idioma == "PT") medianomegraf = "Média=" else medianomegraf = "Mean="
   box <- ggplot(d) +
-    geom_boxplot(aes(x = var), fill = colorspace::lighten(cor,0.2)) +
+    geom_boxplot(aes(x = var), fill = cor) +
     ggthemes::theme_clean() +
     ggtitle(vetor_comsep_c(paste0(nome," (n=", length(d$var[!is.na(d$var)]), ")"), 40)) +
     labs(x="",y="") +
@@ -145,7 +146,7 @@ graficos_continua = function (var, nome, bins = 20, cor = "cyan4", digitos = 2, 
     xlim(min,max) +
     ggrepel::geom_label_repel(data = data.frame("x" = c(summary(var)[c(1:3,5,6)]),
                                        "y" = c(-0.2,0.1,-0.1,0.1,-0.2),
-                                       "label" = ponto_para_virgula(paste0(c("Min=","Q1=","Med=","Q3=","Max="), round(summary(var)[c(1:3,5,6)],digitos)), virgula)),
+                                       "label" = ponto_para_virgula(paste0(c("Min=","Q1=","Med=","Q3=","Max="), round(summary(var)[c(1:3,5,6)],digitos)), virgula),direction="y"),
                      aes(x = x, y = y, label = label),
                      color = "black")
 
@@ -167,5 +168,17 @@ graficos_continua = function (var, nome, bins = 20, cor = "cyan4", digitos = 2, 
           panel.grid.minor.x = element_line(colour = "lightgray"),
           panel.grid.major.y = element_blank()) +
     geom_label(data=data.frame(x = media,y = 0, label = ponto_para_virgula(paste0(medianomegraf,round(summary(var)[4], digitos)), virgula)),aes(x=x,y=y,label=label), color = "black")
-  return(box/histo)
+
+  if(tipo=="ambos") res=box/histo else
+    if(tipo=="box") res=box + theme_icic() +
+    theme(axis.text.y = element_blank(),
+          axis.ticks.y = element_blank(),
+          axis.line.y = element_blank())
+     else
+      if(tipo=="hist") res = histo +
+    ggtitle(vetor_comsep_c(paste0(nome," (n=", length(d$var[!is.na(d$var)]), ")"), 40)) +
+    theme_icic() +
+    theme(axis.title.x = element_blank())
+
+  return(res)
 }
