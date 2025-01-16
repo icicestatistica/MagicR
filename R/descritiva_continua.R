@@ -84,7 +84,7 @@ desc_uni_continua <- function(vari,nome,bins=20,texto=T, grafico=T,cor='cyan4',d
              nf)
     tex=paste(tex,collapse="")} else tex=NULL
 
-  if(grafico==T) grafico=magicR::graficos_continua(vari,nome,20,cor,digitos,idioma,virgula) else grafico=NULL
+  if(grafico==T) grafico=magicR::graficos_continua(var=vari,nome=nome,tipo="ambos",bins=20,cor=cor,digitos=digitos,idioma=idioma,virgula=virgula) else grafico=NULL
 
   testes = data.frame(Nome1 = "", Nome2 = nome, tipo = "numeric", sig_ou_não = '-', resumo = inter_resumo, sup = NA)
 
@@ -146,7 +146,7 @@ graficos_continua = function (var, nome, tipo="ambos",bins = 20, cor = "cyan4", 
     xlim(min,max) +
     ggrepel::geom_label_repel(data = data.frame("x" = c(summary(var)[c(1:3,5,6)]),
                                        "y" = c(-0.2,0.1,-0.1,0.1,-0.2),
-                                       "label" = ponto_para_virgula(paste0(c("Min=","Q1=","Med=","Q3=","Max="), round(summary(var)[c(1:3,5,6)],digitos)), virgula),direction="y"),
+                                       "label" = ponto_para_virgula(paste0(c("Min=","Q1=","Med=","Q3=","Max="), round(summary(var)[c(1:3,5,6)],digitos)), virgula),direction="y",force_pull=5),
                      aes(x = x, y = y, label = label),
                      color = "black")
 
