@@ -4,12 +4,10 @@
 \alias{relatorio}
 \title{Gera um relatório formatado a partir de uma lista.}
 \usage{
-relatorio(a, pularprimeiro = TRUE, dig = 2)
+relatorio(a, dig = 2)
 }
 \arguments{
 \item{a}{Um vetor ou lista contendo os objetos a serem relatados. Pode incluir data.frames, listas, vetores de caracteres ou outros tipos de objetos.}
-
-\item{pularprimeiro}{Um valor lógico (default = TRUE). Se TRUE, o primeiro elemento da lista/vetor é ignorado.}
 
 \item{dig}{Um número inteiro (default = 2). Define o número de casas decimais a serem exibidas nas tabelas de data.frames.}
 }

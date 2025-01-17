@@ -37,7 +37,6 @@ desc_uni_continua(
 }
 \value{
 Retorna uma lista com os seguintes elementos:
-\item{testes}{Dataframe com informações sobre a variável, incluindo tipo e sigla do teste.}
 \item{result}{Dataframe com as estatísticas descritivas da variável.}
 \item{texto}{Texto interpretativo gerado, se o parâmetro texto for TRUE.}
 \item{interp}{Resumo interpretativo em formato de texto resumido.}

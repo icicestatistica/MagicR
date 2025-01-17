@@ -236,7 +236,6 @@ quiqua_aderencia <- function(vetor,
 #' Se o parâmetro `teste` for ativado, realiza-se o teste qui-quadrado de aderência para verificar se a distribuição da variável é uniforme.
 #'
 #' @return Um objeto `list` contendo os seguintes elementos:
-#' \item{testes}{Data frame com informações sobre o teste realizado.}
 #' \item{result}{Data frame com as frequências absolutas, relativas e acumuladas.}
 #' \item{texto}{Texto interpretativo sobre os grupos da variável categórica.}
 #' \item{interp}{Interpretação textual resumida sobre a variável}
@@ -325,8 +324,10 @@ desc_uni_categorica <- function(variavel,
   testes <- data.frame(Nome1 = "", Nome2 = nome, tipo = ifelse(ordenar, "factor", "ordinal"),
                        sig_ou_não = '-', resumo = interp_resumo, sup = NA)
 
-  resultados <- list("testes" = testes, "result" = d, "texto" = testectexto,
+  resultados <- list("result" = d, "texto" = testectexto,
                      "interp" = interpretacao, "tabela" = testectabela, "grafico" = graficoc)
+
+  attr(resultados,"testes")=testes
 
   return(resultados)
 }
