@@ -88,7 +88,8 @@ desc_uni_continua <- function(vari,nome,bins=20,texto=T, grafico=T,cor='cyan4',d
   testes = data.frame(Nome1 = "", Nome2 = nome, tipo = "numeric", sig_ou_não = '-', resumo = inter_resumo, sup = NA)
 
   resultados = list("result"=d,"texto"=tex,"interp"=interpretacao,"grafico"=grafico)
-  attr(resultados,testes)
+
+  attr(resultados,"testes")=testes
 
   return(resultados)}
 
