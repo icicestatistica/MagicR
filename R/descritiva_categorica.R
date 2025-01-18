@@ -45,6 +45,7 @@ grafico_categorica <- function(var,
                                orient="auto",
                                nas=F){
   var = unlist(var)
+  if(is.numeric(var)==T & niveis[1]!="auto") var = rep(niveis,var)
   if (niveis[1]=='auto') niveis = names(table(var))
   if(nas) {var[is.na(var)]="N/A"; niveis = c(niveis,"N/A")}
   var = factor(var, levels=niveis)
@@ -273,6 +274,7 @@ desc_uni_categorica <- function(variavel,
                                 forcarpizza=F,
                                 orient="auto") {
   variavel <- unlist(variavel)
+  if(is.numeric(variavel)==T & niveis[1]!="auto") variavel = rep(niveis,variavel)
   if (niveis[1] == 'auto') niveis <- names(table(variavel))
   var_ini = factor(variavel,niveis); niv_ini = niveis
   if(nas) {variavel[is.na(variavel)]="N/A"; niveis = c(niveis,"N/A")}
