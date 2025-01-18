@@ -52,7 +52,6 @@ desc_uni_categorica(
 }
 \value{
 Um objeto `list` contendo os seguintes elementos:
-\item{testes}{Data frame com informações sobre o teste realizado.}
 \item{result}{Data frame com as frequências absolutas, relativas e acumuladas.}
 \item{texto}{Texto interpretativo sobre os grupos da variável categórica.}
 \item{interp}{Interpretação textual resumida sobre a variável}

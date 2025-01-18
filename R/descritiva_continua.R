@@ -13,7 +13,6 @@
 #' @param virgula Se TRUE, utiliza vírgula como separador decimal no texto e gráficos (padrão é FALSE).
 #'
 #' @return Retorna uma lista com os seguintes elementos:
-#' \item{testes}{Dataframe com informações sobre a variável, incluindo tipo e sigla do teste.}
 #' \item{result}{Dataframe com as estatísticas descritivas da variável.}
 #' \item{texto}{Texto interpretativo gerado, se o parâmetro texto for TRUE.}
 #' \item{interp}{Resumo interpretativo em formato de texto resumido.}
@@ -88,7 +87,11 @@ desc_uni_continua <- function(vari,nome,bins=20,texto=T, grafico=T,cor='cyan4',d
 
   testes = data.frame(Nome1 = "", Nome2 = nome, tipo = "numeric", sig_ou_não = '-', resumo = inter_resumo, sup = NA)
 
-  return(list("testes"=testes,"result"=d,"texto"=tex,"interp"=interpretacao,"grafico"=grafico))}
+  resultados = list("result"=d,"texto"=tex,"interp"=interpretacao,"grafico"=grafico)
+
+  attr(resultados,"testes")=testes
+
+  return(resultados)}
 
 #' Função para Gerar Gráficos de Variáveis Contínuas
 #'
