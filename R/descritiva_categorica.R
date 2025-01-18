@@ -51,14 +51,14 @@ grafico_categorica <- function(var,
   escolhaori = ifelse(orient=="v","v",ifelse(orient=="h","h",ifelse(orient=="auto",ifelse(length(niveis)>7 | max(sapply(niveis,nchar))>25,"h","v"))))
   niveisnovo=magicR::vetor_comsep_c(niveis,ifelse(escolhaori=="v",11,25))
   levels(var)=niveisnovo
-  tab <- data.frame(table(var),perc=paste0(table(var),paste0(" (",round(100*prop.table(table(var)),digitos),"%)")),prop=paste0(table(var),paste0("\n  (",100*round(prop.table(table(var)),3),"%)")))
+  tab <- data.frame(table(var),perc=paste0(table(var),paste0(" (",round(100*prop.table(table(var)),digitos),"%)")),prop=paste0(table(var),paste0("\n  (",round(100*prop.table(table(var)),digitos),"%)")))
+  cores = grDevices::colorRampPalette(cor)(length(niveis))
   if(ordenar==T) {
     if(escolhaori=="v") ord = -tab$Freq else ord=tab$Freq
     tab = na.omit(tab) %>%
     mutate(var=forcats::fct_reorder(var, ord))
-  cores = grDevices::colorRampPalette(na.omit(cor[order(ord)]))(length(niveis))
-  niveisnovo = niveisnovo[order(ord)]} else
-  {cores = grDevices::colorRampPalette(cor)(length(niveis))}
+    cores = cores[order(ord)]
+    niveisnovo = niveisnovo[order(ord)]}
   ### gráficos de barras
   if(length(niveis) > 2 & forcarpizza==F) {
     if(escolhaori=="v"){
