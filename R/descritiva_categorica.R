@@ -45,6 +45,7 @@ grafico_categorica <- function(var,
                                orient="auto",
                                nas=F){
   var = unlist(var)
+  if(is.numeric(var)==T & niveis[1]!="auto") var = rep(niveis,var)
   if (niveis[1]=='auto') niveis = names(table(var))
   if(nas) {var[is.na(var)]="N/A"; niveis = c(niveis,"N/A")}
   var = factor(var, levels=niveis)
@@ -88,15 +89,27 @@ grafico_categorica <- function(var,
   } else
     ### Gráfico de pizza
   {if(length(cor)==1) cores = grDevices::colorRampPalette(c(cor,"white"))(length(niveis)+1)[-(length(niveis)+1)]
+
+  get_contrast_color <- function(hex_color) {
+    rgb <- col2rgb(hex_color) / 255  # Convertendo para valores entre 0 e 1
+    luminance <- 0.2126 * rgb[1, ] + 0.7152 * rgb[2, ] + 0.0722 * rgb[3, ]  # Fórmula de luminância relativa
+    ifelse(luminance > 0.5, "black", "white")  # Cor do texto: preta para cores claras, branca para escuras
+  }
+
+  # Adicionando as cores de contraste ao dataframe
+  contrast_color <- unlist(unname(sapply(cores, get_contrast_color)))
+
   result = ggplot(tab, aes(x="",y=Freq,fill=var)) +
     geom_bar(stat="identity", width=1) +
-    coord_polar("y", start=0) + theme_void(base_size=12) +
+    coord_polar("y", start=0) +
+    theme_void(base_size=12) +
     labs(fill="",title=paste0(magicR::vetor_comsep_c(nome,50)," (n=",length(na.omit(var)),")")) +
     theme(plot.title = element_text(hjust = 0.5, size = ceiling(12 * 1.1), face = "bold"),
           plot.subtitle = element_text(size = ceiling(12 * 1.05)),
           plot.background = element_rect(colour="white")) +
-    geom_text(aes(label = ponto_para_virgula(prop,virgula)), color = "white", position = position_stack(vjust = 0.5)) +
-    scale_fill_manual(labels = niveisnovo,values=cores)}
+    geom_text(aes(label = ponto_para_virgula(prop,virgula)),color = contrast_color, position = position_stack(vjust = 0.5)) +
+    scale_fill_manual(labels = niveisnovo,values=cores)+
+    scale_color_identity()}
   return(result)}
 
 #' quiqua_aderencia
@@ -273,6 +286,7 @@ desc_uni_categorica <- function(variavel,
                                 forcarpizza=F,
                                 orient="auto") {
   variavel <- unlist(variavel)
+  if(is.numeric(variavel)==T & niveis[1]!="auto") variavel = rep(niveis,variavel)
   if (niveis[1] == 'auto') niveis <- names(table(variavel))
   var_ini = factor(variavel,niveis); niv_ini = niveis
   if(nas) {variavel[is.na(variavel)]="N/A"; niveis = c(niveis,"N/A")}
