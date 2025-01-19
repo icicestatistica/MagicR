@@ -112,10 +112,9 @@ desc_uni_continua <- function(vari,nome,bins=20,texto=T, grafico=T,cor='cyan4',d
 #'
 #' @examples
 #' dados <- rnorm(100)
-#' grafico <- graficos_continua(dados, nome = "Variável X")
-#' print(grafico)
+#' graficos_continua(dados, nome = "Variável X")
 #'
-#' @import ggplot2 colorspace ggthemes patchwork ggrepel stringr
+#' @import ggplot2 ggthemes patchwork ggrepel stringr
 #' @export
 #'
 
@@ -147,9 +146,9 @@ graficos_continua = function (var, nome, tipo="ambos",bins = 20, cor = "cyan4", 
           plot.title = element_text(hjust = 0.5),
           plot.background = element_rect(colour = "white")) +
     xlim(min,max) +
-    ggrepel::geom_label_repel(data = data.frame("x" = c(summary(var)[c(1:3,5,6)]),
-                                       "y" = c(-0.2,0.1,-0.1,0.1,-0.2),
-                                       "label" = ponto_para_virgula(paste0(c("Min=","Q1=","Med=","Q3=","Max="), round(summary(var)[c(1:3,5,6)],digitos)), virgula),direction="y",force_pull=5),
+    geom_label(data = data.frame("x" = c(summary(var)[c(1:3,5,6)]),
+                                       "y" = c(-0.2,0.1,-0.1,0.2,-0.2),
+                                       "label" = ponto_para_virgula(paste0(c("Min=","Q1=","Med=","Q3=","Max="), round(summary(var)[c(1:3,5,6)],digitos)), virgula)),
                      aes(x = x, y = y, label = label),
                      color = "black")
 
