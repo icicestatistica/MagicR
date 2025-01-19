@@ -146,13 +146,11 @@ graficos_continua = function (var, nome, tipo="ambos",bins = 20, cor = "cyan4", 
           plot.title = element_text(hjust = 0.5),
           plot.background = element_rect(colour = "white")) +
     xlim(min,max) +
-    ggrepel::geom_label_repel(data = data.frame("x" = c(summary(var)[c(1:3,5,6)]),
-                                       "y" = c(-0.2,0.1,-0.1,0.1,-0.2),
+    geom_label(data = data.frame("x" = c(summary(var)[c(1:3,5,6)]),
+                                       "y" = c(-0.2,0.1,-0.1,0.2,-0.2),
                                        "label" = ponto_para_virgula(paste0(c("Min=","Q1=","Med=","Q3=","Max="), round(summary(var)[c(1:3,5,6)],digitos)), virgula)),
                      aes(x = x, y = y, label = label),
-                     color = "black",
-                     direction="y",
-                     force=10)
+                     color = "black")
 
   histo <- ggplot(d, aes(x = var)) +
     geom_histogram(aes(y = after_stat(density)), bins = bins, fill = cor) +

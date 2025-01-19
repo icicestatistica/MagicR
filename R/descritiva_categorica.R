@@ -44,6 +44,14 @@ grafico_categorica <- function(var,
                                forcarpizza=F,
                                orient="auto",
                                nas=F){
+
+
+  get_contrast_color <- function(hex_color) {
+    rgb <- col2rgb(hex_color) / 255  # Convertendo para valores entre 0 e 1
+    luminance <- 0.2126 * rgb[1, ] + 0.7152 * rgb[2, ] + 0.0722 * rgb[3, ]  # Fórmula de luminância relativa
+    ifelse(luminance > 0.5, "black", "white")  # Cor do texto: preta para cores claras, branca para escuras
+  }
+
   var = unlist(var)
   if(is.numeric(var)==T & niveis[1]!="auto") var = rep(niveis,var)
   if (niveis[1]=='auto') niveis = names(table(var))
@@ -54,15 +62,19 @@ grafico_categorica <- function(var,
   levels(var)=niveisnovo
   tab <- data.frame(table(var),perc=paste0(table(var),paste0(" (",round(100*prop.table(table(var)),digitos),"%)")),prop=paste0(table(var),paste0("\n  (",round(100*prop.table(table(var)),digitos),"%)")))
   cores = grDevices::colorRampPalette(cor)(length(niveis))
+  contrast_color <- unlist(unname(sapply(cores, get_contrast_color)))
+
   if(ordenar==T) {
     if(escolhaori=="v") ord = -tab$Freq else ord=tab$Freq
     tab = na.omit(tab) %>%
     mutate(var=forcats::fct_reorder(var, ord))
     cores = cores[order(ord)]
     niveisnovo = niveisnovo[order(ord)]}
+
   ### gráficos de barras
   if(length(niveis) > 2 & forcarpizza==F) {
     if(escolhaori=="v"){
+
       ### vertical
       result <- ggplot(tab) +
         geom_bar(aes(x=var,y=Freq,fill=var),stat="identity")  +
@@ -74,6 +86,7 @@ grafico_categorica <- function(var,
         magicR::theme_icic("h") +
         theme(legend.position = "none",
               axis.text = element_text(size=12))} else
+
           ### horizontal
         {sobra = max(tab$Freq)*0.05
         result = ggplot(tab) +
@@ -87,17 +100,11 @@ grafico_categorica <- function(var,
           theme(legend.position = "none",
                 axis.text = element_text(size=12))}
   } else
+
     ### Gráfico de pizza
-  {if(length(cor)==1) cores = grDevices::colorRampPalette(c(cor,"white"))(length(niveis)+1)[-(length(niveis)+1)]
-
-  get_contrast_color <- function(hex_color) {
-    rgb <- col2rgb(hex_color) / 255  # Convertendo para valores entre 0 e 1
-    luminance <- 0.2126 * rgb[1, ] + 0.7152 * rgb[2, ] + 0.0722 * rgb[3, ]  # Fórmula de luminância relativa
-    ifelse(luminance > 0.5, "black", "white")  # Cor do texto: preta para cores claras, branca para escuras
-  }
-
-  # Adicionando as cores de contraste ao dataframe
-  contrast_color <- unlist(unname(sapply(cores, get_contrast_color)))
+  {if(length(cor)==1) {cores = grDevices::colorRampPalette(c(cor,"white"))(length(niveis)+1)[-(length(niveis)+1)]
+                      contrast_color <- unlist(unname(sapply(cores, get_contrast_color)))
+                      if (ordenar==T) cores = cores[order(ord)]}
 
   result = ggplot(tab, aes(x="",y=Freq,fill=var)) +
     geom_bar(stat="identity", width=1) +
