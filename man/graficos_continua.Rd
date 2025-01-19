@@ -46,7 +46,6 @@ Esta função gera gráficos de boxplot e histograma para visualizar a distribui
 }
 \examples{
 dados <- rnorm(100)
-grafico <- graficos_continua(dados, nome = "Variável X")
-print(grafico)
+graficos_continua(dados, nome = "Variável X")
 
 }
