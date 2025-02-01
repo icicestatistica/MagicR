@@ -55,7 +55,7 @@ grafico_categorica <- function(var,
   var = unlist(var)
   if(is.numeric(var)==T & niveis[1]!="auto") var = rep(niveis,var)
   if (niveis[1]=='auto') niveis = names(table(var))
-  if(nas) {var[is.na(var)]="N/A"; niveis = c(niveis,"N/A")}
+  if(nas) {var[is.na(var)]="N/A"; niveis = unique(c(niveis,"N/A"))}
   var = factor(var, levels=niveis)
   escolhaori = ifelse(orient=="v","v",ifelse(orient=="h","h",ifelse(orient=="auto",ifelse(length(niveis)>7 | max(sapply(niveis,nchar))>25,"h","v"))))
   niveisnovo=magicR::vetor_comsep_c(niveis,ifelse(escolhaori=="v",11,25))
@@ -287,11 +287,9 @@ desc_uni_categorica <- function(variavel,
                                 acumula = TRUE,
                                 teste = FALSE,
                                 grafico = TRUE,
-                                cor = "cyan4",
                                 digitos = 2,
                                 virgula = FALSE,
-                                forcarpizza=F,
-                                orient="auto") {
+                                ...) {
   variavel <- unlist(variavel)
   if(is.numeric(variavel)==T & niveis[1]!="auto") variavel = rep(niveis,variavel)
   if (niveis[1] == 'auto') niveis <- names(table(variavel))
@@ -337,7 +335,7 @@ desc_uni_categorica <- function(variavel,
   }
 
   if (grafico) {
-      graficoc <- magicR::grafico_categorica(variavel, nome, niveis, cor, ordenar, virgula,digitos,forcarpizza,orient)
+      graficoc <- magicR::grafico_categorica(variavel, nome, niveis, ordenar=ordenar, virgula=virgula,digitos=digitos,nas=nas,...)
   } else {
     graficoc <- NULL
   }

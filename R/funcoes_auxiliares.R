@@ -1,9 +1,9 @@
 #' Formata números com casas decimais personalizadas
 #'
 #' Esta função formata números com a quantidade desejada de casas decimais,
-#' permitindo configurar o separador decimal.
+#' permitindo configurar o separador decimal. Apenas repete os caracteres não numéricos do vetor.
 #'
-#' @param numero Um valor numérico a ser formatado.
+#' @param numero Um valor numérico ou vetor a ser formatado.
 #' @param dig Um valor inteiro indicando o número de casas decimais. O padrão é `2`.
 #' @param virgula Um valor lógico. Se `TRUE`, utiliza vírgula como separador decimal; se `FALSE`, utiliza ponto. O padrão é `FALSE`.
 #' @return Uma string representando o número formatado com o separador decimal definido.
@@ -11,10 +11,19 @@
 #' magic_format(3.14159) # "3.14"
 #' magic_format(3.14159, dig = 3) # "3.142"
 #' magic_format(3.14159, virgula = TRUE) # "3,14"
-magic_format = function(numero,dig=2,virgula=F) {
-  dm = ifelse(virgula==F,".",",")
-  res=formatC(numero,digits = dig,decimal.mark = dm, format = "f")
-  return(res)
+#'
+#'
+#'
+magic_format = function(numero,dig=2,virgula=F){
+
+  mformat = function(num,dig,virgula) {
+    if(is.numeric(num)==F & is.integer(num)==F) res = num else {
+      dm = ifelse(virgula==F,".",",")
+      res=formatC(num,digits = dig,decimal.mark = dm, format = "f")}
+    return(res)
+  }
+
+  return(sapply(type.convert(as.list(numero),as.is=T),function(x) mformat(x,dig,virgula)))
 }
 
 
@@ -29,7 +38,7 @@ magic_format = function(numero,dig=2,virgula=F) {
 #' @examples
 #' asteriscos(3) # "\\*\\*\\*"
 #' asteriscos(2, barra = FALSE) # "**"
-astericos = function(n,barra=T){
+asteriscos = function(n,barra=T){
   res=ifelse(barra==T,paste0(rep("\\*",n),collapse=""),paste0(rep("*",n),collapse=""))
   return(res)
 }
@@ -53,14 +62,13 @@ pvalor = function (p,barras=T,igual=F,virgula=F) {
   if (is.numeric(p) == F | is.na(p) == T) {
     res = "" } else {
       pv = magic_format(p,3,virgula)
-      if (p < 0.001) {res = paste0("<0",dm,"001",asteriscos(3,barras))} else
+      if (p < 0.001) {res = paste0("<",magic_format(0.001,3,virgula),asteriscos(3,barras))} else
         if (p < 0.01) {res=paste0(ig,pv,asteriscos(2,barras))} else
           if(p<0.05) {res=paste0(ig,pv,asteriscos(1,barras))} else
             res=paste0(ig,pv)
     }
   return(res)
 }
-
 
 
 #' Função para separar um vetor em partes com base em um corte inicial

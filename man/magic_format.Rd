@@ -7,7 +7,7 @@
 magic_format(numero, dig = 2, virgula = F)
 }
 \arguments{
-\item{numero}{Um valor numérico a ser formatado.}
+\item{numero}{Um valor numérico ou vetor a ser formatado.}
 
 \item{dig}{Um valor inteiro indicando o número de casas decimais. O padrão é `2`.}
 
@@ -18,10 +18,13 @@ Uma string representando o número formatado com o separador decimal definido.
 }
 \description{
 Esta função formata números com a quantidade desejada de casas decimais,
-permitindo configurar o separador decimal.
+permitindo configurar o separador decimal. Apenas repete os caracteres não numéricos do vetor.
 }
 \examples{
 magic_format(3.14159) # "3.14"
 magic_format(3.14159, dig = 3) # "3.142"
 magic_format(3.14159, virgula = TRUE) # "3,14"
+
+
+
 }

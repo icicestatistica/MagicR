@@ -14,7 +14,8 @@ graficos_continua(
   idioma = "PT",
   virgula = F,
   xmin = "auto",
-  xmax = "auto"
+  xmax = "auto",
+  labels = T
 )
 }
 \arguments{

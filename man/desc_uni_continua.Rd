@@ -13,7 +13,10 @@ desc_uni_continua(
   cor = "cyan4",
   digitos = 2,
   idioma = "PT",
-  virgula = F
+  virgula = F,
+  estat_tab = "auto",
+  nomes_tab = "auto",
+  labels = T
 )
 }
 \arguments{
