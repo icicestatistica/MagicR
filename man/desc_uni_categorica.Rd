@@ -14,11 +14,9 @@ desc_uni_categorica(
   acumula = TRUE,
   teste = FALSE,
   grafico = TRUE,
-  cor = "cyan4",
   digitos = 2,
   virgula = FALSE,
-  forcarpizza = F,
-  orient = "auto"
+  ...
 )
 }
 \arguments{
@@ -40,11 +38,11 @@ desc_uni_categorica(
 
 \item{grafico}{Lógico. Se `TRUE`, gera um gráfico de barras para a variável categórica. Padrão: `TRUE`.}
 
-\item{cor}{Cor a ser utilizada no gráfico de barras. Padrão: `"cyan4"`. Pode ser um vetor de cores também.}
-
 \item{digitos}{Número de casas decimais para arredondamento. Padrão: `2`.}
 
 \item{virgula}{Lógico. Se `TRUE`, utiliza vírgula como separador decimal. Padrão: `FALSE`.}
+
+\item{cor}{Cor a ser utilizada no gráfico de barras. Padrão: `"cyan4"`. Pode ser um vetor de cores também.}
 
 \item{forcarpizza}{lógico (opcional, padrão = FALSE) se devemos forçar um gráfico de pizza ou deixa ele escolher (pizza para dois níveis e barras para mais de dois)}
 

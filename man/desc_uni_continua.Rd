@@ -7,16 +7,15 @@
 desc_uni_continua(
   vari,
   nome,
-  bins = 20,
   texto = T,
   grafico = T,
-  cor = "cyan4",
   digitos = 2,
   idioma = "PT",
   virgula = F,
   estat_tab = "auto",
   nomes_tab = "auto",
-  labels = T
+  qqgraf = F,
+  ...
 )
 }
 \arguments{
@@ -24,19 +23,19 @@ desc_uni_continua(
 
 \item{nome}{Nome da variável (como string) para ser utilizado nos gráficos e no texto gerado.}
 
-\item{bins}{Número de bins para o histograma (padrão é 20).}
-
 \item{texto}{Se TRUE, gera uma descrição textual dos resultados. Caso contrário, não gera texto (padrão é TRUE).}
 
 \item{grafico}{Se TRUE, gera gráficos para visualizar a distribuição dos dados. Caso contrário, não gera gráficos (padrão é TRUE).}
-
-\item{cor}{Cor a ser usada nos gráficos (padrão é 'cyan4').}
 
 \item{digitos}{Número de dígitos para arredondamento nas estatísticas (padrão é 2).}
 
 \item{idioma}{Idioma para a geração do texto ('PT' ou 'EN'; o padrão é 'PT').}
 
 \item{virgula}{Se TRUE, utiliza vírgula como separador decimal no texto e gráficos (padrão é FALSE).}
+
+\item{bins}{Número de bins para o histograma (padrão é 20).}
+
+\item{cor}{Cor a ser usada nos gráficos (padrão é 'cyan4').}
 }
 \value{
 Retorna uma lista com os seguintes elementos:
