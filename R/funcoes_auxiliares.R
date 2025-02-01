@@ -1,18 +1,63 @@
-#' Formata p-valores com estrelas
+#' Formata números com casas decimais personalizadas
 #'
-#' Essa função é usada internamente para formatar p-valores de forma consistente,
-#' adicionando estrelas conforme os níveis de significância estatística.
+#' Esta função formata números com a quantidade desejada de casas decimais,
+#' permitindo configurar o separador decimal.
+#'
+#' @param numero Um valor numérico a ser formatado.
+#' @param dig Um valor inteiro indicando o número de casas decimais. O padrão é `2`.
+#' @param virgula Um valor lógico. Se `TRUE`, utiliza vírgula como separador decimal; se `FALSE`, utiliza ponto. O padrão é `FALSE`.
+#' @return Uma string representando o número formatado com o separador decimal definido.
+#' @examples
+#' magic_format(3.14159) # "3.14"
+#' magic_format(3.14159, dig = 3) # "3.142"
+#' magic_format(3.14159, virgula = TRUE) # "3,14"
+magic_format = function(numero,dig=2,virgula=F) {
+  dm = ifelse(virgula==F,".",",")
+  res=formatC(numero,digits = dig,decimal.mark = dm, format = "f")
+  return(res)
+}
 
+
+#' Gera uma sequência de estrelas para significância estatística
+#'
+#' Esta função retorna uma sequência de asteriscos conforme o número especificado,
+#' com opção de incluir barras invertidas.
+#'
+#' @param n Um valor inteiro indicando o número de asteriscos desejados.
+#' @param barra Um valor lógico. Se `TRUE`, inclui barras invertidas (`\\*`) nos asteriscos; se `FALSE`, usa apenas `*`. O padrão é `TRUE`.
+#' @return Uma string com a sequência de asteriscos formatada.
+#' @examples
+#' asteriscos(3) # "\\*\\*\\*"
+#' asteriscos(2, barra = FALSE) # "**"
+astericos = function(n,barra=T){
+  res=ifelse(barra==T,paste0(rep("\\*",n),collapse=""),paste0(rep("*",n),collapse=""))
+  return(res)
+}
+
+
+#' Formata p-valores com estrelas e opções adicionais
+#'
+#' Essa função formata p-valores com diferentes níveis de significância estatística,
+#' adicionando estrelas conforme os níveis de significância. Oferece opções para configurar
+#' a exibição de barras, igualdade e separador decimal.
 #'
 #' @param p Um valor numérico representando o p-valor.
+#' @param barras Um valor lógico. Se `TRUE`, utiliza barras (`\\*`) para exibir as estrelas; se `FALSE`, não utiliza barras.
+#' @param igual Um valor lógico. Se `TRUE`, adiciona um sinal de igualdade (`=`) antes do valor do p-valor formatado.
+#' @param virgula Um valor lógico. Se `TRUE`, utiliza vírgula como separador decimal; se `FALSE`, utiliza ponto.
 #' @return Uma string formatada do p-valor com as estrelas correspondentes aos níveis de significância.
 #' @keywords internal
-pvalor = function (p) {
-  if (is.numeric(p) == F) res = "" else
-    if (is.na(p) == T) res = "" else
-      if (p > 0.05) res = formatC(round(p, 3), format = "f", digits = 3) else
-        if (p > 0.01) res = paste0(formatC(round(p, 3), format = "f", digits = 3), "\\*") else
-          if (p >= 0.001) res = paste0(formatC(round(p, 3), format = "f", digits = 3), "\\*\\*") else res = "<0.001\\*\\*\\*"
+
+pvalor = function (p,barras=T,igual=F,virgula=F) {
+  ig=ifelse(igual==F,"","=")
+  if (is.numeric(p) == F | is.na(p) == T) {
+    res = "" } else {
+      pv = magic_format(p,3,virgula)
+      if (p < 0.001) {res = paste0("<0",dm,"001",asteriscos(3,barras))} else
+        if (p < 0.01) {res=paste0(ig,pv,asteriscos(2,barras))} else
+          if(p<0.05) {res=paste0(ig,pv,asteriscos(1,barras))} else
+            res=paste0(ig,pv)
+    }
   return(res)
 }
 

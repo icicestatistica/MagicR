@@ -34,21 +34,30 @@
 desc_uni_continua <- function(vari,nome,bins=20,texto=T, grafico=T,cor='cyan4',digitos=2, idioma="PT",virgula=F){
   nf=""
   vari=unlist(vari)
-  if(length(summary(vari))==6) {N=length(vari); na=0} else {N=length(vari);na=summary(vari)[7]}
-  if(length(vari)-sum(is.na(vari))<3 | length(vari)-sum(is.na(vari))>3000 | min(vari,na.rm=T)==max(vari,na.rm=T)) {p = "N/A";nf="Não foi possível realizar o teste shapiro-wilk para normalidade, uma vez que não há observações suficientes para fazê-lo.  \n"} else {shap = shapiro.test(vari) ; p=magicR::pvalor(shap$p.value); if(shap$p.value <0.05) rej <- "menor que 0.05, rejeitou" else rej="maior ou igual a 0.05, não rejeitou"}
-  cv=round(sd(vari,na.rm=T)/summary(vari)[4]*100,digitos)
+  if(is.numeric(vari)==F & is.integer(vari)==F) stop("Erro: A entrada deve ser numérica!")
+  if (missing(nome)) stop("Erro: O argumento 'nome' é obrigatório!")
+  suma = summary(vari)
+  if(length(suma)==6) {N=length(vari); na=0} else {N=length(vari);na=suma[7]}
+  if(length(vari)-sum(is.na(vari))<3 |
+     length(vari)-sum(is.na(vari))>3000 |
+     min(vari,na.rm=T)==max(vari,na.rm=T)) {
+    p = "N/A";nf="Não foi possível realizar o teste shapiro-wilk para normalidade, uma vez que não há observações suficientes para fazê-lo.  \n"} else {
+      shap = shapiro.test(vari)
+      p=magicR::pvalor(shap$p.value)
+      rej = ifelse(shap$p.value <0.05,"menor que 0.05, rejeitou","maior ou igual a 0.05, não rejeitou")}
   parametros <- c("Total","N/A","N","Min-Máx","Q1-Q3","Mediana","Média","DP","CV", "SW")
   iqr = round(summary(vari)[5]-summary(vari)[2],digitos)
   if(sum(is.na(vari))==length(vari)) variavel=c(N,paste0(na," (100%)"),0,"-","-","-","-","-","-","-") else {
+
     variavel <- c(N,
                   paste0(na," (",round(100*na/N,digitos),"%)"),
                   N-na,
-                  paste0(round(summary(vari)[1],digitos),"-",round(summary(vari)[6],digitos)),
-                  paste0(round(summary(vari)[2],digitos),"-",round(summary(vari)[5],digitos)),
-                  round(summary(vari)[3],digitos),
-                  round(summary(vari)[4],digitos),
+                  paste0(round(suma[1],digitos),"-",round(suma[6],digitos)),
+                  paste0(round(suma[2],digitos),"-",round(suma[5],digitos)),
+                  round(suma[3],digitos),
+                  round(suma[4],digitos),
                   round(sd(vari,na.rm=T),digitos),
-                  paste0(cv,"%"),
+                  paste0(round(sd(vari,na.rm=T)/suma[4]*100,digitos),"%"),
                   p)}
   d <- data.frame("Característica"=parametros,"Estatística"=unlist(variavel))
   tex=NULL
@@ -184,3 +193,38 @@ graficos_continua = function (var, nome, tipo="ambos",bins = 20, cor = "cyan4", 
 
   return(res)
 }
+
+#' Gera um gráfico Q-Q plot com teste de normalidade
+#'
+#' Esta função cria um gráfico de probabilidade Q-Q (Q-Q plot) para uma amostra numérica,
+#' adicionando uma anotação com os resultados do teste de Shapiro-Wilk de normalidade.
+#'
+#' @importFrom ggpubr ggqqplot
+#' @importFrom stats shapiro.test
+#'
+#' @param x Vetor numérico com os dados da amostra.
+#' @param nome Uma string que representa o nome da variável a ser exibida no título do gráfico.
+#' @param virgula Um valor lógico. Se `TRUE`, utiliza vírgula como separador decimal nas anotações; se `FALSE`, utiliza ponto. O padrão é `FALSE`.
+#' @param digitos Um valor inteiro indicando o número de casas decimais a ser utilizado na formatação do teste de normalidade. O padrão é `2`.
+#' @return Um objeto gráfico gerado pelo pacote `ggpubr`, contendo o Q-Q plot com anotações do teste de normalidade.
+#' @examples
+#' set.seed(123)
+#' dados <- rnorm(100)
+#' magic_qqplot(dados, nome = "Amostra de teste")
+#'
+#' magic_qqplot(dados, nome = "Exemplo", virgula = TRUE, digitos = 3)
+magic_qqplot = function(x, nome, virgula=F, digitos=2) {
+
+  shap = shapiro.test(x)
+  rnr=ifelse(shap$p.value<0.05,""," não")
+
+  graf=ggpubr::ggqqplot(x) +
+    labs(x="Quantis teóricos", y="Amostra", title=paste0(nome," (n=",length(na.omit(x)),")")) +
+    annotate(geom="text", label=paste0("W=",magic_format(shap$statistic, digitos, virgula),
+                                       "; p=", pvalor(shap$p.value, barras=F, virgula=virgula),
+                                       "\n normalidade", rnr," rejeitada"), x=1, y=1.3*min(x)) +
+    theme(plot.title = element_text(hjust=0.5))
+
+  return(graf)
+}
+

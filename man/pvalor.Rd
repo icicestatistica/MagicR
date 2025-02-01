@@ -2,18 +2,25 @@
 % Please edit documentation in R/funcoes_auxiliares.R
 \name{pvalor}
 \alias{pvalor}
-\title{Formata p-valores com estrelas}
+\title{Formata p-valores com estrelas e opções adicionais}
 \usage{
-pvalor(p)
+pvalor(p, barras = T, igual = F, virgula = F)
 }
 \arguments{
 \item{p}{Um valor numérico representando o p-valor.}
+
+\item{barras}{Um valor lógico. Se `TRUE`, utiliza barras (`\\*`) para exibir as estrelas; se `FALSE`, não utiliza barras.}
+
+\item{igual}{Um valor lógico. Se `TRUE`, adiciona um sinal de igualdade (`=`) antes do valor do p-valor formatado.}
+
+\item{virgula}{Um valor lógico. Se `TRUE`, utiliza vírgula como separador decimal; se `FALSE`, utiliza ponto.}
 }
 \value{
 Uma string formatada do p-valor com as estrelas correspondentes aos níveis de significância.
 }
 \description{
-Essa função é usada internamente para formatar p-valores de forma consistente,
-adicionando estrelas conforme os níveis de significância estatística.
+Essa função formata p-valores com diferentes níveis de significância estatística,
+adicionando estrelas conforme os níveis de significância. Oferece opções para configurar
+a exibição de barras, igualdade e separador decimal.
 }
 \keyword{internal}
