@@ -20,6 +20,6 @@ Imports:
     ggthemes,
     ggrepel,
     knitr,
-    rstatix
+    rstatix,
     glue
 RoxygenNote: 7.3.1
