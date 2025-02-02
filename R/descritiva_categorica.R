@@ -10,8 +10,8 @@
 #' @param niveis vetor de strings (opcional, padrão = "auto") Os níveis da variável categórica.
 #'  Se definido como "auto", os níveis serão automaticamente extraídos da variável.
 #' @param cor string (opcional, padrão = "cyan4") Cor das barras ou das fatias do gráfico.
-#' @param ordenar lógico (opcional, padrão = TRUE) Se \code{TRUE}, as categorias serão ordenadas por
-#'  frequência. Caso contrário, elas são apresentadas na ordem original.
+#' @param ordenar Opções: T, F e 'auto' (opcional, padrão = 'auto') Se \code{TRUE}, as categorias serão ordenadas por
+#'  frequência. Caso contrário, elas são apresentadas na ordem original. Se 'auto', ordenará characters e não ordenará factors.
 #' @param virgula lógico (opcional, padrão = FALSE) Se \code{TRUE}, utiliza vírgula como separador decimal nos rótulos dos gráficos (caso contrário, usa ponto).
 #' @param digitos numérico (opcional, padrão = `1`) número de casas decimais no percentual nos labels dos gráficos.
 #' @param forcarpizza lógico (opcional, padrão = FALSE) se devemos forçar um gráfico de pizza ou deixa ele escolher (pizza para dois níveis e barras para mais de dois)
@@ -38,7 +38,7 @@ grafico_categorica <- function(var,
                                nome,
                                niveis='auto',
                                cor='cyan4',
-                               ordenar=T,
+                               ordenar='auto',
                                virgula=F,
                                digitos=1,
                                forcarpizza=F,
@@ -51,7 +51,7 @@ grafico_categorica <- function(var,
     luminance <- 0.2126 * rgb[1, ] + 0.7152 * rgb[2, ] + 0.0722 * rgb[3, ]  # Fórmula de luminância relativa
     ifelse(luminance > 0.5, "black", "white")  # Cor do texto: preta para cores claras, branca para escuras
   }
-
+  if(ordenar=="auto") ordenar = ifelse(class(var)=="factor",F,T)
   var = unlist(var)
   if(is.numeric(var)==T & niveis[1]!="auto") var = rep(niveis,var)
   if (niveis[1]=='auto') niveis = names(table(var))

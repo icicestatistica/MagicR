@@ -9,7 +9,7 @@ grafico_categorica(
   nome,
   niveis = "auto",
   cor = "cyan4",
-  ordenar = T,
+  ordenar = "auto",
   virgula = F,
   digitos = 1,
   forcarpizza = F,
@@ -27,8 +27,8 @@ Se definido como "auto", os níveis serão automaticamente extraídos da variáv
 
 \item{cor}{string (opcional, padrão = "cyan4") Cor das barras ou das fatias do gráfico.}
 
-\item{ordenar}{lógico (opcional, padrão = TRUE) Se \code{TRUE}, as categorias serão ordenadas por
-frequência. Caso contrário, elas são apresentadas na ordem original.}
+\item{ordenar}{Opções: T, F e 'auto' (opcional, padrão = 'auto') Se \code{TRUE}, as categorias serão ordenadas por
+frequência. Caso contrário, elas são apresentadas na ordem original. Se 'auto', ordenará characters e não ordenará factors.}
 
 \item{virgula}{lógico (opcional, padrão = FALSE) Se \code{TRUE}, utiliza vírgula como separador decimal nos rótulos dos gráficos (caso contrário, usa ponto).}
 
