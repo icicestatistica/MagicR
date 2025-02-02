@@ -58,6 +58,8 @@ asteriscos = function(n,barra=T){
 #' @keywords internal
 
 pvalor = function (p,barras=T,igual=F,virgula=F) {
+
+  pval=function(p,barras,igual,virgula){
   ig=ifelse(igual==F,"","=")
   if (is.numeric(p) == F | is.na(p) == T) {
     res = "" } else {
@@ -67,7 +69,9 @@ pvalor = function (p,barras=T,igual=F,virgula=F) {
           if(p<0.05) {res=paste0(ig,pv,asteriscos(1,barras))} else
             res=paste0(ig,pv)
     }
-  return(res)
+  return(res)}
+
+  return(sapply(type.convert(as.list(p),as.is=T),function(x) pval(x,barras,igual,virgula)))
 }
 
 

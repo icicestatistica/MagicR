@@ -12,7 +12,7 @@ desc_uni_categorica(
   label = FALSE,
   ordenar = TRUE,
   acumula = TRUE,
-  teste = FALSE,
+  quiqua = FALSE,
   grafico = TRUE,
   digitos = 2,
   virgula = FALSE,
@@ -34,26 +34,17 @@ desc_uni_categorica(
 
 \item{acumula}{Lógico. Se `TRUE`, adiciona uma coluna com frequência acumulada. Padrão: `TRUE`.}
 
-\item{teste}{Lógico. Se `TRUE`, executa o teste qui-quadrado de aderência na variável categórica. Padrão: `FALSE`.}
-
-\item{grafico}{Lógico. Se `TRUE`, gera um gráfico de barras para a variável categórica. Padrão: `TRUE`.}
+\item{quiqua}{Lógico. Se `TRUE`, executa o teste qui-quadrado de aderência na variável categórica. Padrão: `FALSE`.}
 
 \item{digitos}{Número de casas decimais para arredondamento. Padrão: `2`.}
 
 \item{virgula}{Lógico. Se `TRUE`, utiliza vírgula como separador decimal. Padrão: `FALSE`.}
-
-\item{cor}{Cor a ser utilizada no gráfico de barras. Padrão: `"cyan4"`. Pode ser um vetor de cores também.}
-
-\item{forcarpizza}{lógico (opcional, padrão = FALSE) se devemos forçar um gráfico de pizza ou deixa ele escolher (pizza para dois níveis e barras para mais de dois)}
-
-\item{orient}{opcional (padrão = "auto"). Se auto, opta por vertical se a quantidade de categorias for menor que 7 e o tamanho dos labels de todas categorias for menor que 25 e horizontal caso contrário. Outras opções são "v" (gráfico vertical) e "h" (gráfico horizontal)}
 }
 \value{
 Um objeto `list` contendo os seguintes elementos:
 \item{result}{Data frame com as frequências absolutas, relativas e acumuladas.}
-\item{texto}{Texto interpretativo sobre os grupos da variável categórica.}
+\item{texto}{Texto interpretativo sobre os grupos da variável categórica, com resultados do teste qui-quadrado, se aplicável.}
 \item{interp}{Interpretação textual resumida sobre a variável}
-\item{tabela}{Resultado do teste qui-quadrado, se aplicável.}
 \item{grafico}{Objeto gráfico (ggplot2) com o gráfico de barras ou pizza}
 }
 \description{
@@ -67,7 +58,7 @@ A função produz:
 - Um texto descritivo interpretativo da variável categórica.
 - Opcionalmente, um gráfico de barras para visualização.
 
-Se o parâmetro `teste` for ativado, realiza-se o teste qui-quadrado de aderência para verificar se a distribuição da variável é uniforme.
+Se o parâmetro `quiqua` for ativado, realiza-se o teste qui-quadrado de aderência para verificar se a distribuição da variável é uniforme.
 }
 \examples{
 # Criando um vetor categórico de exemplo
@@ -78,7 +69,7 @@ resultado <- desc_uni_categorica(
   variavel = variavel,
   nome = "Exemplo",
   ordenar = TRUE,
-  teste = TRUE,
+  quiqua = TRUE,
   grafico = TRUE
 )
 

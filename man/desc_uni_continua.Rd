@@ -15,15 +15,16 @@ desc_uni_continua(
   estat_tab = "auto",
   nomes_tab = "auto",
   qqgraf = F,
+  shaptest = T,
   ...
 )
 }
 \arguments{
 \item{vari}{Vetor numérico com os dados da variável contínua.}
 
-\item{nome}{Nome da variável (como string) para ser utilizado nos gráficos e no texto gerado.}
+\item{nome}{Nome da variável (como string) para ser utilizado nos gráficos e no texto gerado (obrigatório).}
 
-\item{texto}{Se TRUE, gera uma descrição textual dos resultados. Caso contrário, não gera texto (padrão é TRUE).}
+\item{texto}{Se TRUE, gera uma descrição textual detalhada dos resultados. Caso contrário, não gera texto (padrão é TRUE).}
 
 \item{grafico}{Se TRUE, gera gráficos para visualizar a distribuição dos dados. Caso contrário, não gera gráficos (padrão é TRUE).}
 
@@ -33,28 +34,36 @@ desc_uni_continua(
 
 \item{virgula}{Se TRUE, utiliza vírgula como separador decimal no texto e gráficos (padrão é FALSE).}
 
-\item{bins}{Número de bins para o histograma (padrão é 20).}
+\item{estat_tab}{Formato personalizado para as estatísticas apresentadas na tabela (padrão é 'auto').}
 
-\item{cor}{Cor a ser usada nos gráficos (padrão é 'cyan4').}
+\item{nomes_tab}{Nomes personalizados para as estatísticas apresentadas na tabela (padrão é 'auto').}
+
+\item{qqgraf}{Se TRUE, gera um gráfico QQ para avaliação da normalidade (padrão é FALSE).}
+
+\item{shaptest}{Se TRUE, realiza o teste de Shapiro-Wilk para avaliação de normalidade, se as condições forem atendidas (padrão é TRUE).}
+
+\item{...}{Argumentos adicionais para personalização dos gráficos gerados.}
 }
 \value{
 Retorna uma lista com os seguintes elementos:
 \item{result}{Dataframe com as estatísticas descritivas da variável.}
-\item{texto}{Texto interpretativo gerado, se o parâmetro texto for TRUE.}
+\item{texto}{Texto interpretativo detalhado, se o parâmetro texto for TRUE.}
 \item{interp}{Resumo interpretativo em formato de texto resumido.}
-\item{grafico}{Gráficos gerados, se o parâmetro grafico for TRUE.}
+\item{grafico}{Gráficos gerados para visualizar a distribuição dos dados, se grafico for TRUE.}
+\item{qqplot}{Gráfico QQ gerado, se qqgraf for TRUE.}
 }
 \description{
-Esta função realiza uma descrição estatística de uma variável contínua, incluindo o cálculo de estatísticas básicas, como média, desvio padrão, coeficiente de variação, e teste de normalidade. Também gera um texto interpretativo e gráficos para visualizar a distribuição dos dados.
+Esta função realiza uma análise descritiva de uma variável contínua, incluindo o cálculo de estatísticas básicas, teste de normalidade, e geração de textos interpretativos e gráficos. Além disso, permite personalizar a tabela de estatísticas e gerar gráficos QQ para avaliar a normalidade.
 }
 \examples{
 # Criando um vetor de dados contínuos
 dados <- rnorm(100)
 
-# Chamando a função com texto e gráfico
-resultado <- desc_uni_continua(dados, nome = "Variável X")
+# Chamando a função com texto, gráfico e QQ plot
+resultado <- desc_uni_continua(dados, nome = "Variável X", qqgraf = TRUE)
 
-# Visualizando os resultados
+# Visualizando os gráficos
 resultado$grafico
+resultado$qqplot
 
 }
