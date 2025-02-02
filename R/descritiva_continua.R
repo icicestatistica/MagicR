@@ -34,6 +34,7 @@
 #' resultado$grafico
 #' resultado$qqplot
 #'
+#' @importFrom glue glue_data
 #' @import stringr colorspace ggthemes patchwork ggrepel stats
 #' @export
 #'
@@ -108,7 +109,7 @@ desc_uni_continua <- function(vari,nome,texto=T,grafico=T,digitos=2, idioma="PT"
              paste(names(estatisticas), collapse = ", "))}
 
 
-    variavel=sapply(format_tab,function(x) glue_data(estatisticas,x)) %>% unname()
+    variavel=sapply(format_tab,function(x) glue::glue_data(estatisticas,x)) %>% unname()
     d <- data.frame("Característica"=nomes_tab,"Estatística"=variavel)
 
     tex=NULL
@@ -135,7 +136,7 @@ desc_uni_continua <- function(vari,nome,texto=T,grafico=T,digitos=2, idioma="PT"
     {if(percentmissings<=5) miss <- c("Como há menos de 5% de *missings* (",percentmissings,"%), não há motivos para se preocupar com a ausência de dados.") else { if(percentmissings<20) miss <- c("Como as não respostas representam ",percentmissings,"% das linhas, cabe perguntar-se se há algum tipo de viés (algum fator que influenciou essa ausência de forma sistemática).") else miss <- c("Ressaltamos que há uma grande quantidade de não respostas para essa variável (",percentmissings,"%), por isso recomendamos que algum tipo de explicação seja dada pela ausência desses dados.")}
     tex <- c("* **",nome,": ** Das ",N," linhas presentes no banco de dados, houve ",na, " não respostas,  também chamada \"missings\". Assim, totalizamos ",estatisticas['n_real']," observações no banco de dados. ", miss," \n")}
     tex <- c(tex, " Passamos a avaliar como os valores estão distribuídos: \n")
-    tex <- c(tex, "  + Os dados variaram no intervalo (",glue_data(estatisticas,"{mini}-{maxi}") ,"), portanto sua amplitude (diferença entre o maior e o menor) foi ",ampl,"; \n",
+    tex <- c(tex, "  + Os dados variaram no intervalo (",glue::glue_data(estatisticas,"{mini}-{maxi}") ,"), portanto sua amplitude (diferença entre o maior e o menor) foi ",ampl,"; \n",
              "  + Olhando para os quartis, percebemos que 25% dos valores foram menores que ",estatisticas["Q1"]," e 25% foram maiores que ",estatisticas["Q3"],". Assim, a metade \"central\"  dos dados se distribuiu ao longo de ",iqr," unidades. Esta quantia também é chamada \"Intervalo Interquartil\"; \n",
              "  + A mediana obtida foi ",estatisticas["mediana"], ", que indica que 50% dos dados estão abaixo desse valor e 50% estão acima. A diferença entre a média (",estatisticas["média"],") e a mediana (",estatisticas["mediana"],") ",qt," \n",
              "  + A variabilidade é medida pelo desvio padrão (",estatisticas["dp"],"), e indica quanto os dados variam da média obtida. \n",
